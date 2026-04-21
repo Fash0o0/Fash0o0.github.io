@@ -1,0 +1,380 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging | Fash的回忆簿</title><meta name="author" content="Fash0o0"><meta name="copyright" content="Fash0o0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、论文基本信息 标题：CoMoL: Efficient Mixture of LoRA Experts via Dynamic Core Space Merging  作者及单位：Jie Cao\、Zhenxuan Fan\、Zhuonan Wang、Tianwei Lin、Wenqiao Zhang†、Feifei Shao、Hongwei Wang、Jun Xiao、Siliang Tang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging">
+<meta property="og:url" content="https://fash0o0.github.io/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/index.html">
+<meta property="og:site_name" content="Fash的回忆簿">
+<meta property="og:description" content="一、论文基本信息 标题：CoMoL: Efficient Mixture of LoRA Experts via Dynamic Core Space Merging  作者及单位：Jie Cao\、Zhenxuan Fan\、Zhuonan Wang、Tianwei Lin、Wenqiao Zhang†、Feifei Shao、Hongwei Wang、Jun Xiao、Siliang Tang">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp">
+<meta property="article:published_time" content="2026-04-03T01:31:23.000Z">
+<meta property="article:modified_time" content="2026-04-21T08:56:39.976Z">
+<meta property="article:author" content="Fash0o0">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="LoRA">
+<meta property="article:tag" content="MoE">
+<meta property="article:tag" content="PEFT">
+<meta property="article:tag" content="论文笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging",
+  "url": "https://fash0o0.github.io/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/",
+  "image": "https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp",
+  "datePublished": "2026-04-03T01:31:23.000Z",
+  "dateModified": "2026-04-21T08:56:39.976Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Fash0o0",
+      "url": "https://fash0o0.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://fash0o0.github.io/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E5%9B%BE.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Fash的回忆簿</span></a><a class="nav-page-title" href="/"><span class="site-name">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-03T01:31:23.000Z" title="发表于 2026-04-03 09:31:23">2026-04-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-21T08:56:39.976Z" title="更新于 2026-04-21 16:56:39">2026-04-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="一、论文基本信息"><a href="#一、论文基本信息" class="headerlink" title="一、论文基本信息"></a>一、论文基本信息</h2><ul>
+<li><p><strong>标题</strong>：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2603.00573">CoMoL: Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</a></p>
+</li>
+<li><p><strong>作者及单位</strong>：Jie Cao\<em>、Zhenxuan Fan\</em>、Zhuonan Wang、Tianwei Lin、Wenqiao Zhang†、Feifei Shao、Hongwei Wang、Jun Xiao、Siliang Tang（浙江大学）；Ziyuan Zhao、Rolan Yan（腾讯）（* 为共同一作，†为通讯作者）</p>
+</li>
+<li><p><strong>发表时间</strong>：2026 年 2 月（arXiv 预印本，[cs.CL](cs.CL) 方向）</p>
+</li>
+<li><p><strong>代码开源地址</strong>：暂未开源</p>
+</li>
+<li><p><strong>核心定位</strong>：针对现有 MoE-LoRA 架构存在的参数效率受限、适配粒度粗糙的核心痛点，提出 CoMoL 新型 MoE-LoRA 框架，通过核心空间专家与核心空间路由两大核心组件，在与标准 LoRA 持平的参数与计算开销下，实现细粒度 token 级适配，在数学推理、代码生成等多任务上全面超越现有 SOTA 方法。</p>
+</li>
+</ul>
+<h2 id="二、研究背景与核心问题"><a href="#二、研究背景与核心问题" class="headerlink" title="二、研究背景与核心问题"></a>二、研究背景与核心问题</h2><h3 id="研究背景"><a href="#研究背景" class="headerlink" title="研究背景"></a>研究背景</h3><p>大语言模型全量微调成本极高、易出现灾难性遗忘，以 LoRA 为代表的参数高效微调（PEFT）方法，通过低秩分解仅更新少量参数即可实现模型适配，成为主流方案。但单 LoRA 模块盲目提升秩无法带来性能的线性增长，因此学界将 MoE 与 LoRA 结合，提出 MoE-LoRA 范式，通过多 LoRA 专家 + 动态路由提升模型表达能力。</p>
+<h3 id="核心问题"><a href="#核心问题" class="headerlink" title="核心问题"></a>核心问题</h3><p>现有 MoE-LoRA 方法始终无法解决效率与表达能力的两难困境，存在两大核心瓶颈：</p>
+<ol>
+<li><p><strong>参数效率严重受限</strong>：传统 MoE-LoRA 为每个专家复制完整的 LoRA 矩阵对，参数量随专家数量 N 呈 N 倍增长，严重违背 PEFT 的核心设计初衷，且存在大量参数冗余；同时路由网络参数量随模型维度线性增长，带来额外的存储与计算瓶颈。</p>
+</li>
+<li><p><strong>适配粒度过于粗糙</strong>：软合并类 MoE-LoRA 方法（如 SMEAR）采用实例级路由，基于整个样本的平均表征做专家合并，样本内所有 token 共用同一套专家权重，丢失了 token 级的细粒度动态适配能力；而 token 级路由的软 &#x2F; 稀疏 MoE-LoRA，分别面临 N 倍 FLOPs 增长、推理延迟显著提升的问题，无法兼顾效率与细粒度适配。</p>
+</li>
+</ol>
+<h2 id="三、核心贡献"><a href="#三、核心贡献" class="headerlink" title="三、核心贡献"></a>三、核心贡献</h2><ol>
+<li><strong>问题层面：厘清 MoE-LoRA 的核心瓶颈</strong></li>
+</ol>
+<p>系统揭示了现有 MoE-LoRA 方法性能与效率失衡的根源 ——LoRA 专家数量膨胀带来的参数冗余，以及实例级路由导致的细粒度适配能力缺失，并明确了理想 MoE-LoRA 架构的三大设计目标：保留专家特性的同时最小化参数量、降低激活专家的计算开销、维持 token 级路由且控制路由延迟。</p>
+<ol start="2">
+<li><strong>方法层面：提出 CoMoL 全新 MoE-LoRA 框架</strong></li>
+</ol>
+<p>创新性地提出 LoRA 核心空间的数学表征形式，设计了<strong>核心空间专家</strong>与<strong>核心空间路由</strong>两大核心组件：前者将专家差异化信息约束在与 LoRA 秩匹配的紧凑核心矩阵中，从根源上解决专家参数冗余问题；后者将路由网络投影至 LoRA 的低秩空间，在不损失表达能力的前提下极致压缩路由开销。同时，CoMoL 首次实现了 token 级的 LoRA 专家参数软合并，打破了 “效率 - 细粒度适配” 的两难困境，在与标准 LoRA 相当的参数与计算成本下，完整保留了多专家的表达能力。</p>
+<ol start="3">
+<li><strong>实验层面：全面验证方法的优越性与可扩展性</strong></li>
+</ol>
+<p>通过数学推理、代码生成两大核心任务的系统性实验，验证了 CoMoL 在不同模型架构（Qwen3-8B&#x2F;14B、Llama3.1-8B）、不同 LoRA 秩、不同专家数量下的稳定优势：在参数量与标准 LoRA 持平的前提下，持续超越各类 MoE-LoRA SOTA 方法；同时具备极强的可扩展性，专家数量扩展至 64 仍无显存溢出问题，而同类方法在 16 专家时即出现 OOM，充分证明了其工程实用价值。</p>
+<h2 id="四、核心方法"><a href="#四、核心方法" class="headerlink" title="四、核心方法"></a>四、核心方法</h2><h3 id="4-1-基础理论铺垫"><a href="#4-1-基础理论铺垫" class="headerlink" title="4.1 基础理论铺垫"></a>4.1 基础理论铺垫</h3><h4 id="LoRA-基础原理"><a href="#LoRA-基础原理" class="headerlink" title="LoRA 基础原理"></a>LoRA 基础原理</h4><p>对于冻结的预训练权重矩阵 $W \in \mathbb{R}^{m ×n}$，LoRA 通过低秩分解拟合权重更新量 $\Delta W$，即：</p>
+<p>$W+\Delta W&#x3D;W+B A$</p>
+<p>其中 $B \in \mathbb{R}^{m ×r}$、$A \in \mathbb{R}^{r ×n}$ 为可训练参数，秩 $r \ll min(m, n)$，前向计算为：</p>
+<p>$h&#x3D;W x+B A x$</p>
+<h4 id="传统-MoE-LoRA-的固有局限"><a href="#传统-MoE-LoRA-的固有局限" class="headerlink" title="传统 MoE-LoRA 的固有局限"></a>传统 MoE-LoRA 的固有局限</h4><p>传统 MoE-LoRA 包含 N 个独立的 LoRA 专家 ${E_1,E_2,…,E_N}$，每个专家对应一组独立的 ${B_i,A_i}$，前向计算为：</p>
+<p>$h&#x3D;W x+\sum_{i \in \mathcal{T}(x)} G(x)<em>{i} \cdot B</em>{i} A_{i} x$</p>
+<p>其核心局限在于：</p>
+<ul>
+<li><p>参数量复杂度为 $O(N(m+n)r)$，随专家数 N 线性增长，参数冗余严重；</p>
+</li>
+<li><p>软路由激活所有专家，带来 N 倍 FLOPs 增长；稀疏路由降低理论 FLOPs，但引入极高的推理延迟；</p>
+</li>
+<li><p>实例级软合并方法虽将 FLOPs 降至标准 LoRA 水平，但丢失了 token 级的细粒度适配能力。</p>
+</li>
+</ul>
+<h3 id="4-2-LoRA-核心空间的数学定义"><a href="#4-2-LoRA-核心空间的数学定义" class="headerlink" title="4.2 LoRA 核心空间的数学定义"></a>4.2 LoRA 核心空间的数学定义</h3><p>CoMoL 的核心创新源于对 LoRA 权重的 SVD 解耦，通过对 LoRA 的 B、A 矩阵做缩减 SVD 分解：</p>
+<p>$B&#x3D;U_{B} \sum <em>{B} V</em>{B}^{\top }, \quad A&#x3D;U_{A} \sum <em>{A}V</em>{A}^{\top }$</p>
+<p>其中 $U_{B} \in \mathbb{R}^{m ×r}$、$\sum <em>{B} \in \mathbb{R}^{r ×r}$、$V</em>{B}^{\top} \in \mathbb{R}^{r ×r}$，$U_{A} \in \mathbb{R}^{r ×r}$、$\sum <em>{A} \in \mathbb{R}^{r ×r}$、$V</em>{A}^{\top} \in \mathbb{R}^{r ×n}$。</p>
+<p>定义<strong>核心矩阵</strong> $M \in \mathbb{R}^{r ×r}$：</p>
+<p>$M&#x3D;\sum_{B} V_{B}^{\top} U_{A} \sum_{A}$</p>
+<p>由此，LoRA 的权重更新可被紧凑解耦为：</p>
+<p>$\Delta W&#x3D;U_{B} M V_{A}^{\top }$</p>
+<p>在该表征中，$U_B$ 和 $V_A^\top$ 构成了决定特征方向的奇异子空间，而核心矩阵 M 则负责调制潜在维度间的耦合强度与权重分配，这是 CoMoL 实现参数压缩的数学基础。</p>
+<h3 id="4-3-核心空间专家（Core-Space-Experts）"><a href="#4-3-核心空间专家（Core-Space-Experts）" class="headerlink" title="4.3 核心空间专家（Core Space Experts）"></a>4.3 核心空间专家（Core Space Experts）</h3><h4 id="核心假设"><a href="#核心假设" class="headerlink" title="核心假设"></a>核心假设</h4><p>不同 LoRA 专家共享高度相似的奇异子空间 $U_B$ 和 $V_A^\top$，专家间的差异化知识完全可由紧凑的核心矩阵 $M_i$ 表征，无需为每个专家复制完整的高维 LoRA 矩阵对。</p>
+<h4 id="前向计算重构"><a href="#前向计算重构" class="headerlink" title="前向计算重构"></a>前向计算重构</h4><p>基于上述假设，CoMoL 将 N 个专家的可训练参数约束在 N 个 $r×r$ 的核心矩阵 $M_i$ 中，全局共享 $U_B$ 和 $V_A^\top$，前向计算改写为：</p>
+<p>$h&#x3D;W x+\sum_{i&#x3D;1}^{N} G(x)<em>{i} \cdot\left(U</em>{B} M_{i} V_{A}^{\top}\right) x$</p>
+<h4 id="两大核心优势"><a href="#两大核心优势" class="headerlink" title="两大核心优势"></a>两大核心优势</h4><ol>
+<li><strong>极致的参数效率</strong></li>
+</ol>
+<p>传统 MoE-LoRA 的专家参数量复杂度为 $O(N(m+n)r)$，而 CoMoL 将其降至 $O((m+n)r+N·r^2)$。由于常规设置下 $r \ll m,n$（如 r&#x3D;8，n&#x3D;4096），专家数量 N 增长时，模型整体参数量几乎保持恒定，完全贴合 PEFT 的设计原则。</p>
+<ol start="2">
+<li><strong>token 级软合并，零额外计算开销</strong></li>
+</ol>
+<p>利用矩阵乘法的分配律，前向公式可等价变换为：</p>
+<p>$h&#x3D;W x+U_{B}\left(\sum_{i&#x3D;1}^{N} G(x)<em>{i} M</em>{i}\right) V_{A}^{\top} x$</p>
+<p>该式实现了 token 级的专家软合并：对每个输入 token，先通过路由权重将 N 个核心矩阵软合并为单个合并矩阵 $M_{merged}$，再执行高维投影计算。高维矩阵 $U_B$ 和 $V_A^\top$ 对每个 token 仅需计算一次，主计算量的 FLOPs 降至与标准 LoRA 完全一致的水平，同时完整保留了 token 级的动态适配能力。</p>
+<h4 id="计算复杂度对比"><a href="#计算复杂度对比" class="headerlink" title="计算复杂度对比"></a>计算复杂度对比</h4><p>对于包含 L 个 token 的批次，传统 MoE-LoRA 输出级融合的 FLOPs 为：</p>
+<p>$2 ×L ×r ×(2n+r) ×N + L ×n ×(N-1)$</p>
+<p>而 CoMoL 核心空间合并的 FLOPs 仅为：</p>
+<p>$2 ×L ×r ×(2n+r) + L ×r^2 ×(N-1)$</p>
+<p>主计算开销降至传统方法的 1&#x2F;N，且核心矩阵合并的额外开销因 $r^2 \ll n$ 可忽略不计。</p>
+<h3 id="4-4-核心空间路由（Core-Space-Routing）"><a href="#4-4-核心空间路由（Core-Space-Routing）" class="headerlink" title="4.4 核心空间路由（Core Space Routing）"></a>4.4 核心空间路由（Core Space Routing）</h3><p>传统 MoE-LoRA 的路由网络权重 $W_g \in \mathbb{R}^{N×n}$，参数量复杂度为 $O(N·n)$，随模型维度 n 线性增长，成为额外的性能瓶颈。CoMoL 的核心空间路由针对该问题做了极致优化：</p>
+<ol>
+<li><p>复用 LoRA 低秩投影的中间结果 $\hat{x}&#x3D;V_A^\top x \in \mathbb{R}^r$，将其作为路由网络的输入，替代原始高维 token 表征 x；</p>
+</li>
+<li><p>路由权重计算变为 $G(\hat{x})&#x3D;softmax(W_g \hat{x})$，其中路由权重 $W_g \in \mathbb{R}^{N×r}$，参数量复杂度从 $O(N·n)$ 降至 $O(N·r)$。</p>
+</li>
+</ol>
+<p>在常规设置下（r&#x3D;8，n&#x3D;4096），该设计将路由网络的参数量与计算开销压缩了 512 倍，且完全不损失 token 级路由的细粒度动态性。</p>
+<h3 id="4-5-CoMoL-完整前向流程"><a href="#4-5-CoMoL-完整前向流程" class="headerlink" title="4.5 CoMoL 完整前向流程"></a>4.5 CoMoL 完整前向流程</h3><ol>
+<li><p>对输入 token x，计算低秩投影 $\hat{x}&#x3D;V_A^\top x$；</p>
+</li>
+<li><p>核心空间路由计算每个专家的 token 级权重 $G(\hat{x})_i$；</p>
+</li>
+<li><p>软合并核心矩阵：$M_{merged}&#x3D;\sum_{i&#x3D;1}^N G(\hat{x})_i M_i$；</p>
+</li>
+<li><p>计算最终输出：$h&#x3D;Wx + U_B M_{merged} \hat{x}$。</p>
+</li>
+</ol>
+<h2 id="五、实验验证"><a href="#五、实验验证" class="headerlink" title="五、实验验证"></a>五、实验验证</h2><h3 id="5-1-实验设置"><a href="#5-1-实验设置" class="headerlink" title="5.1 实验设置"></a>5.1 实验设置</h3><ul>
+<li><p><strong>基线方法</strong>：标准 LoRA、软权重 MoE-LoRA（MoLoRA、HydraLoRA）、稀疏 MoE-LoRA（MoLA、AdaMoLE、SparseMoA）、先进 PEFT 方法（DenseLoRA、FlyLoRA）；</p>
+</li>
+<li><p><strong>骨干模型</strong>：Qwen3-8B、Qwen3-14B、Llama3.1-8B，LoRA 秩默认设为 8，专家数默认 8（Qwen3-8B）&#x2F;4（Qwen3-14B）；</p>
+</li>
+<li><p><strong>核心任务</strong>：①数学推理：微调 Math14k 数据集，评测 GSM8K、AQuA 等 6 个数据集，指标为准确率；②代码生成：微调 CodeAlpaca-20k 数据集，评测 HumanEval 基准，指标为 pass@1&#x2F;5&#x2F;10；</p>
+</li>
+<li><p><strong>扩展性实验</strong>：LoRA 秩缩放、专家数量缩放实验，以及核心空间路由的消融实验。</p>
+</li>
+</ul>
+<h3 id="5-2-核心实验结果"><a href="#5-2-核心实验结果" class="headerlink" title="5.2 核心实验结果"></a>5.2 核心实验结果</h3><ol>
+<li><strong>数学推理任务</strong></li>
+</ol>
+<p>Qwen3-8B 上，CoMoL 平均准确率 84.48%，超出标准 LoRA 1.7 个百分点，参数量仅 25.16M（与 LoRA 的 24.77M 基本持平），在 AQuA 数据集上超 LoRA 7.2 个百分点，同时超越了参数量 4 倍于自身的 MoLoRA、MoLA 等方法；Qwen3-14B 上，CoMoL 平均准确率 86.34%，超标准 LoRA 1.16 个百分点，在所有基线中取得最优性能，验证了跨模型规模的稳定性。</p>
+<ol start="2">
+<li><strong>代码生成任务</strong></li>
+</ol>
+<p>Llama3.1-8B 上，CoMoL pass@1 达 35.00%，超越所有基线，参数量仅 23.24M，与标准 LoRA 持平；Qwen3-8B 上，CoMoL pass@1 达 48.11%，大幅超越第二名 DenseLoRA（46.82%），在长思维模型上展现出稳定的学习能力，避免了 FlyLoRA 等方法在不同架构上的性能崩塌。</p>
+<ol start="3">
+<li><strong>扩展性与消融实验</strong></li>
+</ol>
+<p>秩缩放：CoMoL 在所有秩设置下均持续超越标准 LoRA，参数量始终与 LoRA 保持同一量级；</p>
+<p>专家数缩放：CoMoL 在 8 专家时取得最优性能，可平滑扩展至 64 专家而无 OOM 问题，而 HydraLoRA 等方法在 16 专家时即出现显存溢出；</p>
+<p>消融实验：无核心空间路由的 CoMoL 与完整模型性能相当，但参数量随专家数增长显著提升，验证了核心空间路由在不损失性能的前提下极致压缩参数量的有效性。</p>
+<h2 id="六、结论与未来工作"><a href="#六、结论与未来工作" class="headerlink" title="六、结论与未来工作"></a>六、结论与未来工作</h2><h3 id="核心结论"><a href="#核心结论" class="headerlink" title="核心结论"></a>核心结论</h3><p>针对现有 MoE-LoRA 架构参数效率低下、适配粒度粗糙的核心痛点，论文提出的 CoMoL 框架，通过核心空间专家与核心空间路由两大创新设计，实现了 token 级的细粒度专家软合并，同时将参数与计算开销控制在与标准 LoRA 相当的水平。大量系统性实验证明，CoMoL 在数学推理、代码生成等多任务、多骨干模型、多配置下，均持续超越现有 MoE-LoRA SOTA 方法，具备极强的有效性、可扩展性与工程实用价值，为大语言模型的参数高效微调提供了全新范式。</p>
+<h3 id="局限性与未来工作"><a href="#局限性与未来工作" class="headerlink" title="局限性与未来工作"></a>局限性与未来工作</h3><ol>
+<li><p><strong>局限性</strong>：当前 PEFT 领域的研究多聚焦于参数效率优化，缺乏对不同微调场景下 PEFT 方法学习容量边界的系统性探究；现有评测体系无统一的基准框架来评估不同 PEFT 方法的学习能力，导致部分方法在不同模型架构、任务上的性能波动极大。</p>
+</li>
+<li><p><strong>未来工作</strong>：针对 PEFT 方法的学习容量边界开展系统性研究，构建标准化的评测基准与框架，全面厘清不同 PEFT 方法的能力边界与适用场景。</p>
+</li>
+</ol>
+<h2 id="七、关键亮点与思考"><a href="#七、关键亮点与思考" class="headerlink" title="七、关键亮点与思考"></a>七、关键亮点与思考</h2><h3 id="关键亮点"><a href="#关键亮点" class="headerlink" title="关键亮点"></a>关键亮点</h3><ol>
+<li><p><strong>数学层面的根源创新</strong>：基于 SVD 分解对 LoRA 权重进行解耦，首次提出核心矩阵的表征形式，从数学根源上解决了 MoE-LoRA 专家参数冗余的问题，实现了多专家表达能力与极低参数量的兼得。</p>
+</li>
+<li><p><strong>架构层面的范式突破</strong>：首次实现了 token 级的 LoRA 专家参数软合并，打破了传统方法 “实例级合并保效率、token 级路由高开销” 的两难困境，在标准 LoRA 的开销下实现了细粒度的输入自适应适配。</p>
+</li>
+<li><p><strong>极强的工程落地价值</strong>：路由网络的低秩投影设计进一步压缩了额外开销，模型可平滑扩展至 64 个专家无显存压力，无需复杂的稀疏算子优化，极易部署落地，完美适配大模型端侧部署、多场景适配等工业场景。</p>
+</li>
+<li><p><strong>优秀的泛化性与稳定性</strong>：在不同规模、不同架构的骨干模型上均取得稳定的性能提升，无领域 &#x2F; 架构偏好，适配数学推理、代码生成等不同能力维度的下游任务，普适性极强。</p>
+</li>
+</ol>
+<h3 id="深度思考"><a href="#深度思考" class="headerlink" title="深度思考"></a>深度思考</h3><ol>
+<li><p>方法本质：CoMoL 的核心是将 MoE 的专家差异化信息从高维权重空间压缩到低秩核心空间，本质上是对 LoRA 低秩特性的极致挖掘，证明了多专家的能力差异并非来自高维子空间的差异，而是低秩空间内的权重调制，为 PEFT 方法的设计提供了全新的底层思路。</p>
+</li>
+<li><p>拓展方向：该核心空间的设计范式可拓展至其他 PEFT 方法，也可与多任务 &#x2F; 多领域 LoRA 合并结合，实现更高效的多专家能力融合；同时，核心矩阵的设计也为 LoRA 的可解释性分析提供了新的视角。</p>
+</li>
+<li><p>行业价值：在大模型轻量化、端侧部署的行业趋势下，CoMoL 在不增加显存开销的前提下显著提升模型适配能力，有望成为标准 LoRA 之后的新一代主流 PEFT 方案。</p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io">Fash0o0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/">https://fash0o0.github.io/2026/04/03/【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://fash0o0.github.io" target="_blank">Fash的回忆簿</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">论文笔记</a><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/PEFT/">PEFT</a><a class="post-meta__tags" href="/tags/LoRA/">LoRA</a><a class="post-meta__tags" href="/tags/MoE/">MoE</a></div><div class="post-share"><div class="social-share" data-image="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/04/10/%E3%80%90arXiv-2025-%E5%A4%A9%E6%B4%A5%E5%A4%A7%E5%AD%A6%E3%80%91ILoRA%EF%BC%9AFederated%20Learning%20with%20Low-Rank%20Adaptation%20for%20Heterogeneous%20Client%20Aggregation/" title="【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：ILoRA: Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation  作者及单位：Junchao Zhou、Junkang Liu（天津大学智能与计算学部）；Fanhua Shang（天津大学计算机科学与技术学院）  发表时间：2025 年 11 月（arXiv 预印本）  代码开源地址：暂未开源  核心定位：针对联邦学习中 LoRA 微调因客户端数据 &#x2F; 系统异构引发的初始化不稳定、秩不兼容聚合错误、非 IID 数据客户端漂移三大核心痛点，提出基于 QR 分解的统一框架 ILoRA，实现异构秩精准聚合、稳定子空间初始化与客户端漂移缓解，兼顾模型精度、收敛稳定性与通信效率。   二、研究背景与核心问题研究背景 大模型全参数微调计算 &#x2F; 数据成本极高，LoRA作为主流参数高效微调（PEFT）方法，冻结主干网络、仅训练低秩矩阵，适配边缘 &#x2F; 终端设备；  联邦学习（FL）实现去中心化协同训练，无需共享原始数据，满足隐私合规需...</div></div></div></a><a class="pagination-related" href="/2026/03/20/%E3%80%90TMLR-2026-%E6%BE%B3%E9%97%A8%E5%A4%A7%E5%AD%A6%E3%80%91A%20Survey%20on%20Federated%20Fine-Tuning%20of%20Large%20Language%20Models/" title="【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：A Survey on Federated Fine-Tuning of Large Language Models 作者及单位：Yebo Wu, Chunlin Tian, Jingguang Li, He Sun, Kahou Tam, Zhanting Zhou, Haicheng Liao, Jing Xiong, Zhijiang Guo*, Li Li*, Chengzhong Xu（澳门大学物联网国家重点实验室、电子科技大学、香港大学、香港科技大学(广州)） 发表时间：2026年2月（Transactions on Machine Learning Research） 代码开源地址：GitHub repo持续追踪该领域进展（文中提及） 核心定位：针对大语言模型（LLMs）在隐私敏感场景下的微调需求，系统性地提出联邦微调（FedLLM）范式，通过参数高效微调（PEFT）技术解决通信开销、数据异构性、内存墙和计算开销四大核心挑战，实现隐私保护与模型性能的双重目标。   二、研究背景与核心问题2.1 背景演进大语言模型（LLMs）的崛起：GPT-4...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/01/19/%E3%80%90NeurIPS-2025-%E4%BD%9B%E7%BD%97%E9%87%8C%E8%BE%BE%E5%A4%A7%E5%AD%A6%E3%80%91Adaptive%20LoRA%20Experts%20Allocation%20and%20Selection%20for%20Federated%20Fine-Tuning/" title="【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-19</div><div class="info-item-2">【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息标题：Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning（https://arxiv.org/abs/2509.15087v2） 作者及单位：Lei Wang (University of Florida), Jieming Bian (University of Florida), Letian Zhang (Middle Tennessee State University), Jie Xu (University of Florida) 发表时间：2025年（NeurIPS 2025） 代码开源地址：lei-wang-link&#x2F;FedLEASE 核心定位：针对联邦学习中语言模型微调的异构客户端问题，提出FedLEASE框架，通过自适应专家分配和选择机制，实现高效、隐私保护的联邦微调。 二、研究背景与核心问题大型语言模型(LLMs)在各种任务中表现出色，但针对特定领域应用的微调通常需要大量领域特定数据，这些数据可能分布在多个组织中。联邦学习(FL)提供了一种...</div></div></div></a><a class="pagination-related" href="/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/" title="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-20</div><div class="info-item-2">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FlyLoRA: Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts（arXiv:2510.08396v2）  作者及单位：  Heming Zou, Wutong Xu, Yao Zhu, Xiangyang Ji（清华大学自动化系）  Yunliang Zang（天津大学医学工程与转化医学研究院）    发表时间：2025 年 10 月（NeurIPS 2025）  代码开源地址：https://github.com&#x2F;gfyddha&#x2F;FlyLoRA  核心定位：针对低秩适配（LoRA）存在的任务内 &#x2F; 任务间参数干扰、现有 MoE-based LoRA 路由参数开销大的核心痛点，受果蝇嗅觉神经回路启发，提出隐式秩级专家混合的 FlyLoRA 框架，同时实现高效的单任务内解耦与多任务间解耦，在更低的参数与计算开销下，全面提升大模型微调与多任务合并的性能。   二、研究背景与核心问题 大模型微调的...</div></div></div></a><a class="pagination-related" href="/2026/01/27/%E3%80%90arXiv-2025-%E7%BE%8E%E5%9B%BD%E5%9C%A3%E6%AF%8D%E5%A4%A7%E5%AD%A6%E3%80%91FLAME%EF%BC%9ATowards%20Federated%20Fine%20-%20Tuning%20Large%20Language%20Models%20Through%20Adaptive%20SMoE/" title="【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-27</div><div class="info-item-2">【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FLAME: Towards Federated Fine-Tuning Large Language Models Through Adaptive SMoE 作者及单位：Khiem Le¹, Tuan Tran², Ting Hua¹, Nitesh V. Chawla¹；¹ 美国圣母大学，² 爱尔兰都柏林圣三一学院 发表时间：2025 年 07 月 14 日（arXiv 预印本）   代码开源地址：暂未开源 核心定位：针对资源自适应联邦微调中 LoRA 矩阵压缩导致的性能损失、无法真正适配客户端异构算力的核心痛点，提出基于自适应稀疏混合专家（SMoE）的 FLAME 联邦学习框架，在保留完整全局 LoRA 矩阵的前提下，通过调整客户端激活专家数量实现真实算力适配，同时解决输出量级不匹配和专家训练质量失衡问题，显著提升异构场景下联邦微调的性能与效率。  二、研究背景与核心问题研究背景【arXiv-2025-美国圣母大学】FLAME: Towards Federated Fine-Tuning Large Language Models Through ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Fash0o0</div><div class="author-info-description">在码头等火车</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Fash0o0"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">享受活着的每一天</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AE%BA%E6%96%87%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">一、论文基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF%E4%B8%8E%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">二、研究背景与核心问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF"><span class="toc-number">2.1.</span> <span class="toc-text">研究背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.2.</span> <span class="toc-text">核心问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A0%B8%E5%BF%83%E8%B4%A1%E7%8C%AE"><span class="toc-number">3.</span> <span class="toc-text">三、核心贡献</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">四、核心方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%9F%BA%E7%A1%80%E7%90%86%E8%AE%BA%E9%93%BA%E5%9E%AB"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 基础理论铺垫</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LoRA-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86"><span class="toc-number">4.1.1.</span> <span class="toc-text">LoRA 基础原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%A0%E7%BB%9F-MoE-LoRA-%E7%9A%84%E5%9B%BA%E6%9C%89%E5%B1%80%E9%99%90"><span class="toc-number">4.1.2.</span> <span class="toc-text">传统 MoE-LoRA 的固有局限</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-LoRA-%E6%A0%B8%E5%BF%83%E7%A9%BA%E9%97%B4%E7%9A%84%E6%95%B0%E5%AD%A6%E5%AE%9A%E4%B9%89"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 LoRA 核心空间的数学定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E6%A0%B8%E5%BF%83%E7%A9%BA%E9%97%B4%E4%B8%93%E5%AE%B6%EF%BC%88Core-Space-Experts%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">4.3 核心空间专家（Core Space Experts）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%81%87%E8%AE%BE"><span class="toc-number">4.3.1.</span> <span class="toc-text">核心假设</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E5%90%91%E8%AE%A1%E7%AE%97%E9%87%8D%E6%9E%84"><span class="toc-number">4.3.2.</span> <span class="toc-text">前向计算重构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%A4%E5%A4%A7%E6%A0%B8%E5%BF%83%E4%BC%98%E5%8A%BF"><span class="toc-number">4.3.3.</span> <span class="toc-text">两大核心优势</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%AF%B9%E6%AF%94"><span class="toc-number">4.3.4.</span> <span class="toc-text">计算复杂度对比</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E6%A0%B8%E5%BF%83%E7%A9%BA%E9%97%B4%E8%B7%AF%E7%94%B1%EF%BC%88Core-Space-Routing%EF%BC%89"><span class="toc-number">4.4.</span> <span class="toc-text">4.4 核心空间路由（Core Space Routing）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-CoMoL-%E5%AE%8C%E6%95%B4%E5%89%8D%E5%90%91%E6%B5%81%E7%A8%8B"><span class="toc-number">4.5.</span> <span class="toc-text">4.5 CoMoL 完整前向流程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%AE%9E%E9%AA%8C%E9%AA%8C%E8%AF%81"><span class="toc-number">5.</span> <span class="toc-text">五、实验验证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 实验设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E6%A0%B8%E5%BF%83%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 核心实验结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%BB%93%E8%AE%BA%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.</span> <span class="toc-text">六、结论与未来工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%BB%93%E8%AE%BA"><span class="toc-number">6.1.</span> <span class="toc-text">核心结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%80%E9%99%90%E6%80%A7%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.2.</span> <span class="toc-text">局限性与未来工作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%85%B3%E9%94%AE%E4%BA%AE%E7%82%B9%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">7.</span> <span class="toc-text">七、关键亮点与思考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BA%AE%E7%82%B9"><span class="toc-number">7.1.</span> <span class="toc-text">关键亮点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%B1%E5%BA%A6%E6%80%9D%E8%80%83"><span class="toc-number">7.2.</span> <span class="toc-text">深度思考</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/10/%E3%80%90arXiv-2025-%E5%A4%A9%E6%B4%A5%E5%A4%A7%E5%AD%A6%E3%80%91ILoRA%EF%BC%9AFederated%20Learning%20with%20Low-Rank%20Adaptation%20for%20Heterogeneous%20Client%20Aggregation/" title="【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation">【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation</a><time datetime="2026-04-10T01:31:23.000Z" title="发表于 2026-04-10 09:31:23">2026-04-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/" title="【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</a><time datetime="2026-04-03T01:31:23.000Z" title="发表于 2026-04-03 09:31:23">2026-04-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90TMLR-2026-%E6%BE%B3%E9%97%A8%E5%A4%A7%E5%AD%A6%E3%80%91A%20Survey%20on%20Federated%20Fine-Tuning%20of%20Large%20Language%20Models/" title="【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models">【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models</a><time datetime="2026-03-20T15:45:34.000Z" title="发表于 2026-03-20 23:45:34">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/" title="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</a><time datetime="2026-03-20T03:31:23.000Z" title="发表于 2026-03-20 11:31:23">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</a><time datetime="2026-03-19T15:45:34.000Z" title="发表于 2026-03-19 23:45:34">2026-03-19</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2026 By Fash0o0</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="/"></script></div></body></html>

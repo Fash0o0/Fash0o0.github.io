@@ -1,0 +1,564 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition | Fash的回忆簿</title><meta name="author" content="Fash0o0"><meta name="copyright" content="Fash0o0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前置笔记：矩阵奇异值分解（SVD） 一、论文基本信息 标题：FeDeRA: Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition 作者及单位：Yuxuan Yan, Shunpu Tang, Zhiguo Shi, Qianqian Yang（浙江大学信息与电子工">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition">
+<meta property="og:url" content="https://fash0o0.github.io/2025/12/05/%E3%80%90arXiv-2024-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91FeDeRA%EF%BC%9AEfficient%20Fine-tuning%20of%20Language%20Models%20in%20Federated/index.html">
+<meta property="og:site_name" content="Fash的回忆簿">
+<meta property="og:description" content="前置笔记：矩阵奇异值分解（SVD） 一、论文基本信息 标题：FeDeRA: Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition 作者及单位：Yuxuan Yan, Shunpu Tang, Zhiguo Shi, Qianqian Yang（浙江大学信息与电子工">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp">
+<meta property="article:published_time" content="2025-12-05T13:02:02.000Z">
+<meta property="article:modified_time" content="2026-04-21T08:56:39.976Z">
+<meta property="article:author" content="Fash0o0">
+<meta property="article:tag" content="LoRA">
+<meta property="article:tag" content="Non-IID">
+<meta property="article:tag" content="PEFT">
+<meta property="article:tag" content="SVD">
+<meta property="article:tag" content="联邦学习">
+<meta property="article:tag" content="论文笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition",
+  "url": "https://fash0o0.github.io/2025/12/05/%E3%80%90arXiv-2024-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91FeDeRA%EF%BC%9AEfficient%20Fine-tuning%20of%20Language%20Models%20in%20Federated/",
+  "image": "https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp",
+  "datePublished": "2025-12-05T13:02:02.000Z",
+  "dateModified": "2026-04-21T08:56:39.976Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Fash0o0",
+      "url": "https://fash0o0.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://fash0o0.github.io/2025/12/05/%E3%80%90arXiv-2024-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91FeDeRA%EF%BC%9AEfficient%20Fine-tuning%20of%20Language%20Models%20in%20Federated/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E5%9B%BE.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Fash的回忆簿</span></a><a class="nav-page-title" href="/"><span class="site-name">【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-12-05T13:02:02.000Z" title="发表于 2025-12-05 21:02:02">2025-12-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-21T08:56:39.976Z" title="更新于 2026-04-21 16:56:39">2026-04-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0/">联邦学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>前置笔记：<a href="/2025/12/04/%E7%9F%A9%E9%98%B5%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%EF%BC%88SVD%EF%BC%89/" title="矩阵奇异值分解（SVD）">矩阵奇异值分解（SVD）</a></p>
+<h2 id="一、论文基本信息"><a href="#一、论文基本信息" class="headerlink" title="一、论文基本信息"></a>一、论文基本信息</h2><ul>
+<li><strong>标题</strong>：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2404.18848">FeDeRA: Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition</a></li>
+<li><strong>作者及单位</strong>：Yuxuan Yan, Shunpu Tang, Zhiguo Shi, Qianqian Yang（浙江大学信息与电子工程学院）</li>
+<li><strong>发表时间</strong>：2024年5月（arXiv预印本）</li>
+<li><strong>代码开源地址</strong>：[暂未开源]</li>
+<li><strong>核心定位</strong>：针对联邦学习微调PLMs面临non-IID数据导致PEFT性能严重下降的问题，提出通过SVD提取预训练权重的主成分来初始化低秩适配器。</li>
+</ul>
+<h2 id="二、研究背景与核心问题"><a href="#二、研究背景与核心问题" class="headerlink" title="二、研究背景与核心问题"></a>二、研究背景与核心问题</h2><p><strong>研究背景</strong>：</p>
+<ol>
+<li><strong>预训练语言模型（PLMs）的隐私挑战</strong>：PLMs在各类NLP任务上表现出卓越性能，但集中式微调需要聚合所有数据，引发严重的数据隐私担忧。联邦学习（FL）作为分布式协作训练范式，可在不共享原始数据的情况下联合训练模型，成为解决隐私问题的有效方案。</li>
+<li><strong>资源约束瓶颈</strong>：PLMs参数规模达数十亿甚至百亿级，在FL场景下频繁交换完整模型参数产生巨大通信开销；边缘设备计算和内存资源有限，难以支撑全参数微调（FFT）的训练需求。</li>
+<li><strong>参数高效微调（PEFT）的机遇与局限</strong>：LoRA、Adapter、BitFit等PEFT方法通过仅更新少量参数显著降低资源消耗，在集中式训练中已验证有效性。但将其直接应用于FL时，在non-IID数据分布下性能显著劣化，且收敛速度缓慢。</li>
+</ol>
+<p><strong>核心问题</strong>：</p>
+<ul>
+<li><strong>问题1（效率矛盾）</strong>：如何在资源受限的FL客户端上高效微调大规模PLMs，同时减少服务器与客户端间的通信负担？</li>
+<li><strong>问题2（性能退化）</strong>：现有PEFT方法（特别是LoRA）在FL非独立同分布数据下为何会出现严重性能下降？如图1所示，随着数据异质性增强（α减小），PEFT与FFT的性能差距急剧扩大。</li>
+<li><strong>问题3（初始化策略缺陷）</strong>：LoRA随机零初始化导致低秩矩阵A、B在训练初期更新剧烈，在non-IID场景下各客户端更新方向发散，全局模型聚合后难以收敛。</li>
+</ul>
+<h2 id="三、核心贡献"><a href="#三、核心贡献" class="headerlink" title="三、核心贡献"></a>三、核心贡献</h2><ol>
+<li><strong>方法创新</strong>：首次提出FeDeRA（Federated Learning with Decomposed Weight Adaptation），将SVD分解融入LoRA框架，用预训练权重的主成分初始化适配器，本质性地解决了非IID环境下的优化难题。</li>
+<li><strong>理论洞察</strong>：通过权重更新的<strong>幅度变化</strong>和<strong>方向变化</strong>量化分析，揭示FeDeRA相比FedLR（LoRA联邦版）的稳定性优势：权重更新幅度和方向变化小数十至数百倍，初始更新方向与后续更新更一致。</li>
+<li><strong>性能突破</strong>：在6个数据集、3类NLP任务（文本分类、命名实体识别、问答）上，FeDeRA：<ul>
+<li>一致优于所有PEFT基线（FedBF、FedAP、FedLR）</li>
+<li>在20NEWS和WNUT数据集上超越FedFT（全参数微调）</li>
+<li>仅用1.2M可训练参数（约1%）达到与125M参数FedFT相当的精度</li>
+</ul>
+</li>
+<li><strong>效率极致</strong>：在Jetson AGX Orin边缘设备实测中，相比FedFT训练时间减少<strong>90%-96.9%</strong>，通信成本同步大幅降低。</li>
+<li><strong>鲁棒性验证</strong>：在不同异构程度（α∈[0.01, 10]）下，FeDeRA性能波动最小，展现出对数据异构的强鲁棒性。</li>
+</ol>
+<h2 id="四、核心方法"><a href="#四、核心方法" class="headerlink" title="四、核心方法"></a>四、核心方法</h2><h3 id="4-1-联邦学习框架（FedAvg）"><a href="#4-1-联邦学习框架（FedAvg）" class="headerlink" title="4.1 联邦学习框架（FedAvg）"></a>4.1 联邦学习框架（FedAvg）</h3><ul>
+<li><strong>目标函数</strong>：全局模型参数ω通过加权平均各客户端本地损失最小化：<br>$$<br>\min_{\omega}F(\omega)\triangleq\sum_{m&#x3D;1}^{M}p_{m}F_{m}(\omega),\quad p_m&#x3D;\frac{|\mathcal{D}<em>m|}{\sum</em>{i&#x3D;1}^{M}|\mathcal{D}_i|}<br>$$</li>
+<li><strong>训练流程</strong>：每轮选择部分客户端，用全局模型初始化本地模型，本地迭代更新后，服务器按样本数加权聚合参数。</li>
+</ul>
+<h3 id="4-2-LoRA及其局限性"><a href="#4-2-LoRA及其局限性" class="headerlink" title="4.2 LoRA及其局限性"></a>4.2 LoRA及其局限性</h3><ul>
+<li><strong>标准LoRA</strong>：对预训练权重矩阵$W_0\in\mathbb{R}^{d\times k}$，引入低秩更新$\Delta W&#x3D;BA$，其中$B\in\mathbb{R}^{d\times r}, A\in\mathbb{R}^{r\times k}$，秩$r\ll\min(d,k)$。输出为：<br>$$<br>h &#x3D; W_0x + \frac{\beta}{r}BAx<br>$$<ul>
+<li>初始化：$A\sim\mathcal{N}(0,\sigma^2)$，$B&#x3D;0$，保证初始$\Delta W&#x3D;0$</li>
+</ul>
+</li>
+<li><strong>在FL中的问题</strong>：B的零初始化导致初始梯度最大，在non-IID数据下各客户端更新方向剧烈漂移，全局聚合后方向冲突严重，收敛困难。</li>
+</ul>
+<h3 id="4-3-FeDeRA核心机制"><a href="#4-3-FeDeRA核心机制" class="headerlink" title="4.3 FeDeRA核心机制"></a>4.3 FeDeRA核心机制</h3><p><strong>步骤1：SVD分解预训练权重</strong><br>对冻结权重$W_0$执行奇异值分解：<br>$$<br>W_0 \stackrel{SVD}{&#x3D;} U\Sigma V^T<br>$$<br>其中$U\in\mathbb{R}^{d\times d}$为左奇异向量，$V\in\mathbb{R}^{k\times k}$为右奇异向量，$\Sigma&#x3D;\operatorname{diag}(\sigma_1,…,\sigma_k)$为奇异值对角阵（按降序排列）。</p>
+<p><strong>步骤2：主成分初始化低秩矩阵</strong><br>取前$r$个奇异值和对应奇异向量初始化：<br>$$<br>A &#x3D; \sqrt{\Sigma[:r]} \cdot V[:,:r]^T &#x3D; [\sqrt{\sigma_1}v_1^T; …; \sqrt{\sigma_r}v_r^T]<br>$$<br>$$<br>B &#x3D; U[:,:r] \cdot \sqrt{\Sigma[:r]} &#x3D; [\sqrt{\sigma_1}u_1, …, \sqrt{\sigma_r}u_r]<br>$$</p>
+<p><strong>步骤3：保持初始输出不变</strong><br>调整并冻结原始权重矩阵：<br>$$<br>W_0 \leftarrow W_0 - BA<br>$$<br>此时初始输出仍为$W_0x$，但A、B已捕获权重的主成分信息。</p>
+<p><strong>核心优势</strong>：</p>
+<ul>
+<li><strong>优化起点更优</strong>：A、B初始即包含预训练权重的主要结构和方向信息</li>
+<li><strong>更新更稳定</strong>：在non-IID场景下，各客户端基于相同的主成分空间进行微调，更新方向一致性更强</li>
+<li><strong>收敛加速</strong>：避免从零开始学习的剧烈振荡，大幅减少通信轮次</li>
+</ul>
+<h3 id="4-4-理论分析：权重更新稳定性量化"><a href="#4-4-理论分析：权重更新稳定性量化" class="headerlink" title="4.4 理论分析：权重更新稳定性量化"></a>4.4 理论分析：权重更新稳定性量化</h3><p>定义权重矩阵$W$的<strong>幅度向量</strong>$M_w$和<strong>方向矩阵</strong>$D_w$：<br>$$<br>M_w &#x3D; [|w_1|_2, |w_2|_2, …, |w_k|_2]<br>$$<br>$$<br>D_w &#x3D; \left[\frac{w_1}{|w_1|_2}, \frac{w_2}{|w_2|_2}, …, \frac{w_k}{|w_k|_2}\right]<br>$$</p>
+<p><strong>幅度变化</strong>和<strong>方向变化</strong>度量：<br>$$<br>\Delta M_w(W_1,W_2) &#x3D; \frac{\sum_{n&#x3D;1}^{k}|m_{w1}^n - m_{w2}^n|}{k}<br>$$<br>$$<br>\Delta D_w(W_1,W_2) &#x3D; \frac{\sum_{n&#x3D;1}^{k}(1 - \text{CosineSimilarity}(d_{w1}^n, d_{w2}^n))}{k}<br>$$</p>
+<p><strong>实验观测</strong>（图3-4）：</p>
+<ul>
+<li>FedLR（LoRA联邦版）的A、B矩阵在连续全局更新中，幅度和方向变化是FeDeRA的<strong>数十至数百倍</strong></li>
+<li>FedLR的B矩阵因零初始化，初期更新方向与后期几乎正交或相反，导致严重漂移</li>
+<li>FeDeRA在所有层和矩阵上保持稳定的小幅更新，方向一致性高，显著缓解异构性影响</li>
+</ul>
+<h2 id="五、实验验证"><a href="#五、实验验证" class="headerlink" title="五、实验验证"></a>五、实验验证</h2><h3 id="5-1-实验设置"><a href="#5-1-实验设置" class="headerlink" title="5.1 实验设置"></a>5.1 实验设置</h3><ul>
+<li><strong>框架</strong>：FedML + FedNLP</li>
+<li><strong>骨干模型</strong>：RoBERTa-base（125M参数）、DeBERTaV3-base（184M参数）</li>
+<li><strong>PEFT秩</strong>：$r&#x3D;32$，$\beta&#x3D;r$</li>
+<li><strong>客户端</strong>：100-300个，每轮选择5-15个</li>
+<li><strong>数据异构性</strong>：采用Dirichlet分布（α∈[0.01, 1]）生成极端non-IID数据，α越小异构性越强</li>
+<li><strong>优化器</strong>：学习率从{1e-3, 5e-4, 1e-4, 5e-5, 1e-5}中选择</li>
+<li><strong>硬件环境</strong>：Jetson AGX Orin（客户端），8×NVIDIA RTX A6000服务器</li>
+</ul>
+<h3 id="5-2-基线方法"><a href="#5-2-基线方法" class="headerlink" title="5.2 基线方法"></a>5.2 基线方法</h3><table>
+<thead>
+<tr>
+<th align="left">方法</th>
+<th align="left">类型</th>
+<th align="left">可训练参数</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>FedFT</strong></td>
+<td align="left">全参数微调</td>
+<td align="left">125M-184M</td>
+<td align="left">更新所有参数，通信成本高</td>
+</tr>
+<tr>
+<td align="left"><strong>FedBF</strong></td>
+<td align="left">BitFit</td>
+<td align="left">0.1M</td>
+<td align="left">仅微调偏置项</td>
+</tr>
+<tr>
+<td align="left"><strong>FedAP</strong></td>
+<td align="left">Adapter</td>
+<td align="left">1.8M</td>
+<td align="left">在Attention和FFN后插入适配器层</td>
+</tr>
+<tr>
+<td align="left"><strong>FedLR</strong></td>
+<td align="left">LoRA联邦版</td>
+<td align="left">1.2M</td>
+<td align="left">仅对Query和Value矩阵应用LoRA</td>
+</tr>
+</tbody></table>
+<h3 id="5-3-任务性能对比"><a href="#5-3-任务性能对比" class="headerlink" title="5.3 任务性能对比"></a>5.3 任务性能对比</h3><p><strong>表2：文本分类任务准确率（%）</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">模型</th>
+<th align="left">方法</th>
+<th align="left">参数量</th>
+<th align="left">20NEWS（200&#x2F;500&#x2F;1000轮）</th>
+<th align="left">SEMEVAL（200&#x2F;500&#x2F;1000轮）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RoBERTa</td>
+<td align="left">FedFT</td>
+<td align="left">125M</td>
+<td align="left">79.56&#x2F;82.71&#x2F;83.67</td>
+<td align="left">80.34&#x2F;82.99&#x2F;83.53</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">FedBF</td>
+<td align="left">0.1M</td>
+<td align="left">-</td>
+<td align="left">-</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">FedAP</td>
+<td align="left">1.8M</td>
+<td align="left">74.73&#x2F;78.12&#x2F;81.45</td>
+<td align="left">77.28&#x2F;80.15&#x2F;82.67</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">FedLR</td>
+<td align="left">1.2M</td>
+<td align="left">75.81&#x2F;79.63&#x2F;82.40</td>
+<td align="left">78.45&#x2F;81.20&#x2F;83.12</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"><strong>FeDeRA</strong></td>
+<td align="left"><strong>1.2M</strong></td>
+<td align="left"><strong>77.24&#x2F;81.89&#x2F;84.38</strong></td>
+<td align="left"><strong>80.74&#x2F;82.88&#x2F;83.78</strong></td>
+</tr>
+<tr>
+<td align="left">DeBERTaV3</td>
+<td align="left">FedFT</td>
+<td align="left">184M</td>
+<td align="left">76.47&#x2F;82.25&#x2F;83.99</td>
+<td align="left">79.57&#x2F;83.66&#x2F;84.42</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"><strong>FeDeRA</strong></td>
+<td align="left"><strong>1.2M</strong></td>
+<td align="left"><strong>76.91&#x2F;82.63&#x2F;84.38</strong></td>
+<td align="left"><strong>81.12&#x2F;83.45&#x2F;84.50</strong></td>
+</tr>
+</tbody></table>
+<p><strong>表3：命名实体识别任务F1（%）</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">模型</th>
+<th align="left">方法</th>
+<th align="left">WNUT（100&#x2F;200&#x2F;500轮）</th>
+<th align="left">PLONER（50&#x2F;100&#x2F;150轮）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RoBERTa-FedFT</td>
+<td align="left">125M</td>
+<td align="left">50.03&#x2F;51.53&#x2F;52.31</td>
+<td align="left">86.01&#x2F;88.01&#x2F;89.19</td>
+</tr>
+<tr>
+<td align="left">RoBERTa-FeDeRA</td>
+<td align="left">1.2M</td>
+<td align="left"><strong>49.14&#x2F;52.28&#x2F;52.73</strong></td>
+<td align="left"><strong>84.74&#x2F;87.14&#x2F;88.44</strong></td>
+</tr>
+<tr>
+<td align="left">DeBERTaV3-FedFT</td>
+<td align="left">184M</td>
+<td align="left">50.26&#x2F;51.04&#x2F;51.45</td>
+<td align="left">81.41&#x2F;86.24&#x2F;87.06</td>
+</tr>
+<tr>
+<td align="left">DeBERTaV3-FeDeRA</td>
+<td align="left">1.2M</td>
+<td align="left"><strong>50.51&#x2F;51.89&#x2F;52.12</strong></td>
+<td align="left"><strong>81.02&#x2F;84.59&#x2F;86.93</strong></td>
+</tr>
+</tbody></table>
+<p><strong>表4：问答任务EM&#x2F;F1（%）</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">模型</th>
+<th align="left">方法</th>
+<th align="left">SQuADv1.1（50&#x2F;100轮）</th>
+<th align="left">MRQA（100&#x2F;200轮）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RoBERTa-FedFT</td>
+<td align="left">125M</td>
+<td align="left">63.16&#x2F;77.84, 65.27&#x2F;79.62</td>
+<td align="left">51.45&#x2F;60.78, 52.44&#x2F;63.24</td>
+</tr>
+<tr>
+<td align="left">RoBERTa-FeDeRA</td>
+<td align="left">1.2M</td>
+<td align="left"><strong>62.53&#x2F;77.51, 65.31&#x2F;79.98</strong></td>
+<td align="left"><strong>49.73&#x2F;61.27, 52.05&#x2F;63.11</strong></td>
+</tr>
+</tbody></table>
+<p><strong>关键发现</strong>：</p>
+<ul>
+<li>FeDeRA在所有任务上<strong>稳定超越</strong>其他PEFT方法，在20NEWS和WNUT上<strong>超越FedFT</strong></li>
+<li>在500轮内，FeDeRA的20NEWS准确率比FedLR高<strong>2-3个百分点</strong></li>
+<li>在PLONER上，FeDeRA仅用1.2M参数即接近FedFT的89.19% F1</li>
+</ul>
+<h3 id="5-4-训练效率评估（表5）"><a href="#5-4-训练效率评估（表5）" class="headerlink" title="5.4 训练效率评估（表5）"></a>5.4 训练效率评估（表5）</h3><p><strong>目标</strong>：达到特定精度的<strong>时间成本（分钟）</strong>（WiFi带宽20-30Mbps）</p>
+<table>
+<thead>
+<tr>
+<th align="left">模型</th>
+<th align="left">方法</th>
+<th align="left">20NEWS(90%&#x2F;95%&#x2F;99%)</th>
+<th align="left">WNUT(90%&#x2F;95%&#x2F;99%)</th>
+<th align="left">SQuADv1.1(90%&#x2F;95%&#x2F;99%)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">RoBERTa</td>
+<td align="left">FedFT</td>
+<td align="left">5.60&#x2F;6.53&#x2F;13.19</td>
+<td align="left">5.22&#x2F;7.04&#x2F;10.38</td>
+<td align="left">1.39&#x2F;0.84, 2.31&#x2F;1.96, 5.02&#x2F;5.64</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">FedAP</td>
+<td align="left">0.30&#x2F;0.49&#x2F;0.99</td>
+<td align="left">0.30&#x2F;0.44&#x2F;0.95</td>
+<td align="left">0.21&#x2F;0.12, 0.39&#x2F;0.34, 0.65&#x2F;0.73</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">FedLR</td>
+<td align="left">0.33&#x2F;0.59&#x2F;1.21</td>
+<td align="left">0.27&#x2F;0.39&#x2F;0.72</td>
+<td align="left">0.45&#x2F;0.24, 0.85&#x2F;0.84, 1.43&#x2F;1.79</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"><strong>FeDeRA</strong></td>
+<td align="left"><strong>0.17&#x2F;0.30&#x2F;0.54</strong></td>
+<td align="left"><strong>0.21&#x2F;0.28&#x2F;0.32</strong></td>
+<td align="left"><strong>0.16&#x2F;0.09, 0.31&#x2F;0.28, 0.51&#x2F;0.52</strong></td>
+</tr>
+</tbody></table>
+<p><strong>效率提升</strong>：</p>
+<ul>
+<li><strong>最高96.9%时间降低</strong>：FeDeRA在SQuAD上达到99%目标F1仅需0.52分钟，FedFT需5.64分钟</li>
+<li><strong>最快收敛</strong>：在所有场景下，FeDeRA均是<strong>最早</strong>达到目标精度的方法</li>
+<li><strong>通信成本</strong>：FedFT每轮通信传输125M参数，FeDeRA仅传输1.2M，<strong>降低99%</strong></li>
+</ul>
+<h3 id="5-5-数据异构性鲁棒性（图5）"><a href="#5-5-数据异构性鲁棒性（图5）" class="headerlink" title="5.5 数据异构性鲁棒性（图5）"></a>5.5 数据异构性鲁棒性（图5）</h3><ul>
+<li>在20NEWS上，随着α从1降至0.1（异构性增强）：<ul>
+<li>FedFT准确率仅下降约2%（83.5%→81.5%），展现出全参数更新的鲁棒性</li>
+<li>FedLR下降约8%（82.4%→74.5%），性能急剧恶化</li>
+<li><strong>FeDeRA下降仅约3%（84.0%→81.0%），与FedFT相当，远优于其他PEFT方法</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="5-6-可训练参数预算影响（图6）"><a href="#5-6-可训练参数预算影响（图6）" class="headerlink" title="5.6 可训练参数预算影响（图6）"></a>5.6 可训练参数预算影响（图6）</h3><ul>
+<li><strong>准确率 vs 参数量</strong>：在20NEWS上，FeDeRA在0.1M至9.6M参数范围内<strong>始终领先</strong>，在1.2M时优势最明显</li>
+<li><strong>时间成本 vs 参数量</strong>：为达到76%和80%目标准确率，FeDeRA在所有参数预算下<strong>训练时间最短</strong>，尤其在1.2M时效率最优</li>
+</ul>
+<h3 id="5-7-SVD开销分析（表8）"><a href="#5-7-SVD开销分析（表8）" class="headerlink" title="5.7 SVD开销分析（表8）"></a>5.7 SVD开销分析（表8）</h3><ul>
+<li><strong>一次性成本</strong>：SVD分解仅需在训练前执行一次，耗时约8.62分钟（对125M模型）</li>
+<li><strong>可忽略</strong>：相比FedFT的总训练时间（如13.19分钟），SVD开销占比&lt;10%</li>
+<li><strong>通信效率</strong>：FedFT通信耗时109.67分钟，FeDeRA仅1.68分钟，<strong>降低98.5%</strong></li>
+</ul>
+<h2 id="六、结论与未来工作"><a href="#六、结论与未来工作" class="headerlink" title="六、结论与未来工作"></a>六、结论与未来工作</h2><p><strong>核心结论</strong>：</p>
+<ol>
+<li>FeDeRA通过SVD初始化策略，将预训练权重的主成分信息注入低秩适配器，从根本上解决了LoRA在联邦non-IID场景下的收敛慢、性能差问题</li>
+<li>在仅使用<strong>1%可训练参数</strong>的前提下，达到与全参数微调<strong>相当甚至更优</strong>的性能，训练时间<strong>降低90%以上</strong></li>
+<li>权重更新稳定性分析验证了FeDeRA在幅度和方向上的连续性，为联邦异构环境下的高效微调提供了理论支撑</li>
+<li>方法具有通用性，适用于不同模型架构（RoBERTa、DeBERTa）和多种NLP任务</li>
+</ol>
+<p><strong>局限性与未来工作</strong>：</p>
+<ol>
+<li><strong>数据真实性</strong>：实验依赖公开数据集模拟的non-IID分布，未在真实世界异构数据（如个人对话）上验证</li>
+<li><strong>设备异构性</strong>：未考虑客户端计算能力、网络带宽的差异性，真实FL场景可能存在掉队者（straggler）问题</li>
+<li><strong>更大规模模型</strong>：在千亿参数模型（如LLaMA-65B）上的扩展性和效果有待验证</li>
+<li><strong>隐私增强</strong>：可结合差分隐私、安全聚合等技术进一步提升隐私保护水平</li>
+<li><strong>自适应秩选择</strong>：当前固定秩r&#x3D;32，探索根据任务难度动态调整秩的预算分配策略</li>
+</ol>
+<h2 id="七、关键亮点与思考"><a href="#七、关键亮点与思考" class="headerlink" title="七、关键亮点与思考"></a>七、关键亮点与思考</h2><p><strong>关键亮点</strong>：</p>
+<ol>
+<li><strong>“站在巨人肩膀上”的创新</strong>  ：不颠覆LoRA框架，而是通过<strong>初始化策略的微创新</strong>（SVD替换随机）实现质的飞跃，体现了对问题本质的深刻洞察</li>
+<li><strong>联邦学习专属的PEFT设计</strong>：首次明确指出并系统解决 <strong>non-IID数据 × PEFT</strong> 的复合难题，填补了领域空白</li>
+<li><strong>理论-实验闭环</strong>：不仅提出方法，更通过<strong>可量化的稳定性指标</strong>（幅度&#x2F;方向变化）解释为何有效，增强了说服力</li>
+<li><strong>“免费午餐”效应</strong>  ：SVD分解仅一次性成本，却带来持续整个训练过程的稳定性收益，ROI极高</li>
+<li><strong>实用导向</strong>：在真实边缘设备（Jetson AGX Orin）上实测，WiFi带宽下验证，结果贴近真实部署场景</li>
+</ol>
+<p><strong>批判性思考</strong>：</p>
+<ol>
+<li><strong>SVD的通用性</strong>：SVD初始化是否对所有预训练权重都有效？对于已高度特化的中层或高层注意力矩阵，主成分是否仍代表关键信息？</li>
+<li><strong>秩的选择敏感性</strong>：r&#x3D;32是经验选择，若秩过小，可能丢失重要信息；若过大，则失去参数效率。是否存在与任务复杂度的理论关系？</li>
+<li><strong>与模型剪枝的关联</strong>：FeDeRA本质上是保留预训练权重的主要成分进行微调，这与剪枝中的“重要性保持”思想相通，或可结合结构化剪枝进一步压缩</li>
+<li><strong>跨模态潜力</strong>：方法设计基于Transformer，但SVD初始化策略理论上可推广至CNN、GNN等其他架构的联邦微调</li>
+<li><strong>初始化与个性化</strong>：FeDeRA全局统一初始化，在未来可考虑为每个客户端定制秩分配或奇异值选择，实现 <strong>“全局共享主成分空间 + 客户端私有细节适配”</strong> 的混合个性化</li>
+</ol>
+<p><strong>启发</strong>：<br>该工作揭示了一个重要原则：<strong>在资源受限且数据异构的分布式环境中，初始化策略不仅是优化的起点，更是协调各客户端优化方向、缓解统计异质性的关键控制变量</strong>。这为未来设计FL-friendly的PEFT方法提供了新范式——<strong>初始化即正则化</strong>。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io">Fash0o0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io/2025/12/05/%E3%80%90arXiv-2024-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91FeDeRA%EF%BC%9AEfficient%20Fine-tuning%20of%20Language%20Models%20in%20Federated/">https://fash0o0.github.io/2025/12/05/【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://fash0o0.github.io" target="_blank">Fash的回忆簿</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0/">联邦学习</a><a class="post-meta__tags" href="/tags/Non-IID/">Non-IID</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">论文笔记</a><a class="post-meta__tags" href="/tags/PEFT/">PEFT</a><a class="post-meta__tags" href="/tags/LoRA/">LoRA</a><a class="post-meta__tags" href="/tags/SVD/">SVD</a></div><div class="post-share"><div class="social-share" data-image="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/12/11/%E3%80%90AAAI-2022-%E6%82%89%E5%B0%BC%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6%E3%80%91FedProto%EF%BC%9AFederated-Prototype-Learning-across-Heterogeneous-Clients/" title="【AAAI-2022-悉尼科技大学】FedProto：Federated Prototype Learning across Heterogeneous Clients"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">【AAAI-2022-悉尼科技大学】FedProto：Federated Prototype Learning across Heterogeneous Clients</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FedProto: Federated Prototype Learning across Heterogeneous Clients 作者及单位：Yue Tan¹, Guodong Long¹, Lu Liu¹, Tianyi Zhou²³, Qinghua Lu⁴, Jing Jiang¹, Chengqi Zhang¹ ¹澳大利亚人工智能研究所，悉尼科技大学 ²华盛顿大学 ³马里兰大学帕克分校 ⁴Data61, CSIRO   发表时间：2022年（AAAI Conference on Artificial Intelligence） 代码开源地址：暂未开源 核心定位：针对联邦学习中客户端在数据分布、模型架构、输入输出空间等方面的异构性挑战，提出基于类别原型交换的新型联邦学习框架，通过聚合抽象特征表示而非模型参数实现知识共享，显著提升通信效率、增强隐私保护并改善异构环境下的模型收敛性与泛化性能。  二、研究背景与核心问题联邦学习（FL）旨在通过中央服务器协调多个客户端协同训练模型，同时保护本地数据隐私。然而，现实场景中客户端普遍存在 统计异构性（数据...</div></div></div></a><a class="pagination-related" href="/2025/12/04/%E7%9F%A9%E9%98%B5%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%EF%BC%88SVD%EF%BC%89/" title="矩阵奇异值分解（SVD）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">矩阵奇异值分解（SVD）</div></div><div class="info-2"><div class="info-item-1">推荐视频：【超详细！彻底搞懂矩阵奇异值分解（SVD）本质+计算+应用！】前置笔记：实对称矩阵的正交对角化 一、几何直观：从网格变换说起核心思想：任何线性变换都可分解为 旋转 → 伸缩 → 旋转 三部曲  伸缩变换（对角矩阵）  几何效果：沿坐标轴方向拉伸&#x2F;压缩网格 矩阵形式：$\Sigma &#x3D; \text{diag}(\sigma_1, \sigma_2, …, \sigma_r)$ 特点：主轴方向保持不变，仅改变各轴长度   旋转变换（正交矩阵）  几何效果：刚性旋转（保持长度和角度） 矩阵形式：$Q^TQ &#x3D; I$，逆等于转置：$Q^{-1} &#x3D; Q^T$ 特点：保持向量内积不变，行列式值为±1     二、SVD的数学定义定理：任意 $m \times n$ 实矩阵 $A$ 可分解为：$$A &#x3D; U \Sigma V^T$$其中：  $U$：$m \times m$ 正交矩阵（左奇异向量矩阵） $\Sigma$：$m \times n$ 对角矩阵（奇异值矩阵） $V$：$n \times n$ 正交矩阵（右奇异向量矩阵）  ...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-19</div><div class="info-item-2">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FedFMSL: Federated Learning of Foundation Models With Sparsely Activated LoRA  论文链接：https://ieeexplore.ieee.org/document/10648634/ (DOI: 10.1109&#x2F;TMC.2024.3454634)  作者及单位：  Panlong Wu, Kangshuo Li, Ting Wang：香港中文大学（深圳）理工学院、深圳智能未来网络研究院  Yanjie Dong, Victor C. M. Leung：深圳北理莫斯科大学人工智能研究院、粤港澳大湾区情感智能与普适计算联合实验室  Fangxin Wang（通讯作者）：香港中文大学（深圳）理工学院、深圳智能未来网络研究院、广东省智能未来网络重点实验室    发表时间：2024 年 9 月在线发表，2024 年 12 月正式刊出于《IEEE TRANSACTIONS ON MOBILE COMPUTING》（VOL. 23, NO. 12）  代码开源地址：暂未开源  核心定...</div></div></div></a><a class="pagination-related" href="/2026/01/19/%E3%80%90NeurIPS-2025-%E4%BD%9B%E7%BD%97%E9%87%8C%E8%BE%BE%E5%A4%A7%E5%AD%A6%E3%80%91Adaptive%20LoRA%20Experts%20Allocation%20and%20Selection%20for%20Federated%20Fine-Tuning/" title="【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-19</div><div class="info-item-2">【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息标题：Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning（https://arxiv.org/abs/2509.15087v2） 作者及单位：Lei Wang (University of Florida), Jieming Bian (University of Florida), Letian Zhang (Middle Tennessee State University), Jie Xu (University of Florida) 发表时间：2025年（NeurIPS 2025） 代码开源地址：lei-wang-link&#x2F;FedLEASE 核心定位：针对联邦学习中语言模型微调的异构客户端问题，提出FedLEASE框架，通过自适应专家分配和选择机制，实现高效、隐私保护的联邦微调。 二、研究背景与核心问题大型语言模型(LLMs)在各种任务中表现出色，但针对特定领域应用的微调通常需要大量领域特定数据，这些数据可能分布在多个组织中。联邦学习(FL)提供了一种...</div></div></div></a><a class="pagination-related" href="/2026/01/27/%E3%80%90arXiv-2025-%E7%BE%8E%E5%9B%BD%E5%9C%A3%E6%AF%8D%E5%A4%A7%E5%AD%A6%E3%80%91FLAME%EF%BC%9ATowards%20Federated%20Fine%20-%20Tuning%20Large%20Language%20Models%20Through%20Adaptive%20SMoE/" title="【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-27</div><div class="info-item-2">【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FLAME: Towards Federated Fine-Tuning Large Language Models Through Adaptive SMoE 作者及单位：Khiem Le¹, Tuan Tran², Ting Hua¹, Nitesh V. Chawla¹；¹ 美国圣母大学，² 爱尔兰都柏林圣三一学院 发表时间：2025 年 07 月 14 日（arXiv 预印本）   代码开源地址：暂未开源 核心定位：针对资源自适应联邦微调中 LoRA 矩阵压缩导致的性能损失、无法真正适配客户端异构算力的核心痛点，提出基于自适应稀疏混合专家（SMoE）的 FLAME 联邦学习框架，在保留完整全局 LoRA 矩阵的前提下，通过调整客户端激活专家数量实现真实算力适配，同时解决输出量级不匹配和专家训练质量失衡问题，显著提升异构场景下联邦微调的性能与效率。  二、研究背景与核心问题研究背景【arXiv-2025-美国圣母大学】FLAME: Towards Federated Fine-Tuning Large Language Models Through ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Fash0o0</div><div class="author-info-description">在码头等火车</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Fash0o0"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">享受活着的每一天</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AE%BA%E6%96%87%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">一、论文基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF%E4%B8%8E%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">二、研究背景与核心问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A0%B8%E5%BF%83%E8%B4%A1%E7%8C%AE"><span class="toc-number">3.</span> <span class="toc-text">三、核心贡献</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">四、核心方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6%EF%BC%88FedAvg%EF%BC%89"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 联邦学习框架（FedAvg）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-LoRA%E5%8F%8A%E5%85%B6%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 LoRA及其局限性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-FeDeRA%E6%A0%B8%E5%BF%83%E6%9C%BA%E5%88%B6"><span class="toc-number">4.3.</span> <span class="toc-text">4.3 FeDeRA核心机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E7%90%86%E8%AE%BA%E5%88%86%E6%9E%90%EF%BC%9A%E6%9D%83%E9%87%8D%E6%9B%B4%E6%96%B0%E7%A8%B3%E5%AE%9A%E6%80%A7%E9%87%8F%E5%8C%96"><span class="toc-number">4.4.</span> <span class="toc-text">4.4 理论分析：权重更新稳定性量化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%AE%9E%E9%AA%8C%E9%AA%8C%E8%AF%81"><span class="toc-number">5.</span> <span class="toc-text">五、实验验证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 实验设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E5%9F%BA%E7%BA%BF%E6%96%B9%E6%B3%95"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 基线方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E4%BB%BB%E5%8A%A1%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 任务性能对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E8%AE%AD%E7%BB%83%E6%95%88%E7%8E%87%E8%AF%84%E4%BC%B0%EF%BC%88%E8%A1%A85%EF%BC%89"><span class="toc-number">5.4.</span> <span class="toc-text">5.4 训练效率评估（表5）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-%E6%95%B0%E6%8D%AE%E5%BC%82%E6%9E%84%E6%80%A7%E9%B2%81%E6%A3%92%E6%80%A7%EF%BC%88%E5%9B%BE5%EF%BC%89"><span class="toc-number">5.5.</span> <span class="toc-text">5.5 数据异构性鲁棒性（图5）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-6-%E5%8F%AF%E8%AE%AD%E7%BB%83%E5%8F%82%E6%95%B0%E9%A2%84%E7%AE%97%E5%BD%B1%E5%93%8D%EF%BC%88%E5%9B%BE6%EF%BC%89"><span class="toc-number">5.6.</span> <span class="toc-text">5.6 可训练参数预算影响（图6）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-7-SVD%E5%BC%80%E9%94%80%E5%88%86%E6%9E%90%EF%BC%88%E8%A1%A88%EF%BC%89"><span class="toc-number">5.7.</span> <span class="toc-text">5.7 SVD开销分析（表8）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%BB%93%E8%AE%BA%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.</span> <span class="toc-text">六、结论与未来工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%85%B3%E9%94%AE%E4%BA%AE%E7%82%B9%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">7.</span> <span class="toc-text">七、关键亮点与思考</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/10/%E3%80%90arXiv-2025-%E5%A4%A9%E6%B4%A5%E5%A4%A7%E5%AD%A6%E3%80%91ILoRA%EF%BC%9AFederated%20Learning%20with%20Low-Rank%20Adaptation%20for%20Heterogeneous%20Client%20Aggregation/" title="【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation">【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation</a><time datetime="2026-04-10T01:31:23.000Z" title="发表于 2026-04-10 09:31:23">2026-04-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/" title="【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</a><time datetime="2026-04-03T01:31:23.000Z" title="发表于 2026-04-03 09:31:23">2026-04-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90TMLR-2026-%E6%BE%B3%E9%97%A8%E5%A4%A7%E5%AD%A6%E3%80%91A%20Survey%20on%20Federated%20Fine-Tuning%20of%20Large%20Language%20Models/" title="【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models">【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models</a><time datetime="2026-03-20T15:45:34.000Z" title="发表于 2026-03-20 23:45:34">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/" title="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</a><time datetime="2026-03-20T03:31:23.000Z" title="发表于 2026-03-20 11:31:23">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</a><time datetime="2026-03-19T15:45:34.000Z" title="发表于 2026-03-19 23:45:34">2026-03-19</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2026 By Fash0o0</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="/"></script></div></body></html>

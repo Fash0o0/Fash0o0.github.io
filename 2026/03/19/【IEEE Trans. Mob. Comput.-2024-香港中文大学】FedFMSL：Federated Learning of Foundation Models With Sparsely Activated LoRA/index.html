@@ -1,0 +1,447 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA | Fash的回忆簿</title><meta name="author" content="Fash0o0"><meta name="copyright" content="Fash0o0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、论文基本信息 标题：FedFMSL: Federated Learning of Foundation Models With Sparsely Activated LoRA  论文链接：https:&#x2F;&#x2F;ieeexplore.ieee.org&#x2F;document&#x2F;10648634&#x2F; (DOI: 10.1109&#x2F;TMC.2024.3454634)  作者及单位：  Panlong Wu,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA">
+<meta property="og:url" content="https://fash0o0.github.io/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/index.html">
+<meta property="og:site_name" content="Fash的回忆簿">
+<meta property="og:description" content="一、论文基本信息 标题：FedFMSL: Federated Learning of Foundation Models With Sparsely Activated LoRA  论文链接：https:&#x2F;&#x2F;ieeexplore.ieee.org&#x2F;document&#x2F;10648634&#x2F; (DOI: 10.1109&#x2F;TMC.2024.3454634)  作者及单位：  Panlong Wu,">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp">
+<meta property="article:published_time" content="2026-03-19T15:45:34.000Z">
+<meta property="article:modified_time" content="2026-04-21T08:56:39.976Z">
+<meta property="article:author" content="Fash0o0">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="LoRA">
+<meta property="article:tag" content="Non-IID">
+<meta property="article:tag" content="PEFT">
+<meta property="article:tag" content="联邦学习">
+<meta property="article:tag" content="论文笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA",
+  "url": "https://fash0o0.github.io/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/",
+  "image": "https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp",
+  "datePublished": "2026-03-19T15:45:34.000Z",
+  "dateModified": "2026-04-21T08:56:39.976Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Fash0o0",
+      "url": "https://fash0o0.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://fash0o0.github.io/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E5%9B%BE.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Fash的回忆簿</span></a><a class="nav-page-title" href="/"><span class="site-name">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-19T15:45:34.000Z" title="发表于 2026-03-19 23:45:34">2026-03-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-21T08:56:39.976Z" title="更新于 2026-04-21 16:56:39">2026-04-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0/">联邦学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="一、论文基本信息"><a href="#一、论文基本信息" class="headerlink" title="一、论文基本信息"></a>一、论文基本信息</h2><ul>
+<li><p><strong>标题</strong>：FedFMSL: Federated Learning of Foundation Models With Sparsely Activated LoRA</p>
+</li>
+<li><p><strong>论文链接</strong>：<a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/document/10648634/">https://ieeexplore.ieee.org/document/10648634/</a> (DOI: 10.1109&#x2F;TMC.2024.3454634)</p>
+</li>
+<li><p><strong>作者及单位</strong>：</p>
+<ul>
+<li><p>Panlong Wu, Kangshuo Li, Ting Wang：香港中文大学（深圳）理工学院、深圳智能未来网络研究院</p>
+</li>
+<li><p>Yanjie Dong, Victor C. M. Leung：深圳北理莫斯科大学人工智能研究院、粤港澳大湾区情感智能与普适计算联合实验室</p>
+</li>
+<li><p>Fangxin Wang（通讯作者）：香港中文大学（深圳）理工学院、深圳智能未来网络研究院、广东省智能未来网络重点实验室</p>
+</li>
+</ul>
+</li>
+<li><p><strong>发表时间</strong>：2024 年 9 月在线发表，2024 年 12 月正式刊出于《IEEE TRANSACTIONS ON MOBILE COMPUTING》（VOL. 23, NO. 12）</p>
+</li>
+<li><p><strong>代码开源地址</strong>：暂未开源</p>
+</li>
+<li><p><strong>核心定位</strong>：针对基础模型联邦学习领域的通信开销高、边缘设备计算压力大、客户端数据非 IID 异构三大核心痛点，提出了两阶段个性化联邦学习算法 FedFMSL，融合稀疏激活 LoRA（SAL）与基础模型混合架构（MoFM），在仅微调基础模型不到 0.3% 参数量的前提下，实现了较 SOTA 基线最高 59.19% 的性能提升，完美适配资源受限的边缘计算场景。</p>
+</li>
+</ul>
+<h2 id="二、研究背景与核心问题"><a href="#二、研究背景与核心问题" class="headerlink" title="二、研究背景与核心问题"></a>二、研究背景与核心问题</h2><h3 id="研究背景"><a href="#研究背景" class="headerlink" title="研究背景"></a>研究背景</h3><ol>
+<li><p>基础模型（FM）凭借海量参数与大规模预训练，在 NLP、CV、多模态任务中取得了突破性效果，但其训练依赖大规模数据，而用户隐私数据多分散存储在边缘设备，无法直接集中用于模型训练。</p>
+</li>
+<li><p>联邦学习（FL）通过 “数据不动模型动” 的协同训练范式，在不泄露客户端原始数据的前提下实现分布式模型训练，为基础模型利用边缘分散数据提供了可行路径。</p>
+</li>
+<li><p>现有基础模型与联邦学习的融合工作，大多仅聚焦于 prompt tuning、单一 adapter 插入等轻量化微调方案，未能同时解决通信、计算、数据异构三大核心挑战，在非 IID 场景下性能衰减严重。</p>
+</li>
+</ol>
+<h3 id="核心问题"><a href="#核心问题" class="headerlink" title="核心问题"></a>核心问题</h3><ol>
+<li><p><strong>通信带宽挑战</strong>：基础模型参数量庞大，传统联邦学习的全参数传输与聚合模式，会产生极高的通信开销，远超现代移动网络的承载能力，训练效率极低。</p>
+</li>
+<li><p><strong>边缘计算挑战</strong>：基础模型的训练与推理对算力要求极高，而边缘终端设备普遍存在算力、存储资源受限的问题，无法支撑全参数微调甚至全层 LoRA 微调的计算负载。</p>
+</li>
+<li><p><strong>数据异构挑战</strong>：联邦学习中客户端数据天然呈非 IID 分布，会导致参数发散、分布偏差等统计问题；而基础模型的超大参数空间进一步放大了优化难度，最终造成模型性能的严重下降。</p>
+</li>
+</ol>
+<h2 id="三、核心贡献"><a href="#三、核心贡献" class="headerlink" title="三、核心贡献"></a>三、核心贡献</h2><ol>
+<li><p><strong>提出了两阶段个性化联邦学习框架 FedFMSL</strong> 设计了全局专家协同训练 + 本地专家个性化学习的两阶段流程，既通过联邦协同学习提取全局通用特征，又通过本地训练适配客户端个性化数据分布，同时完成了两阶段算法的收敛性理论证明，为算法有效性提供了严谨的理论支撑。</p>
+</li>
+<li><p><strong>设计了稀疏激活 LoRA（SAL）轻量化微调算法</strong> 针对边缘设备资源受限的问题，提出渐进式稀疏激活机制，通过能力队列与精度阈值控制器，动态调整 LoRA 矩阵的激活层数与参数量，在保证模型性能的同时，大幅降低计算与通信开销，实现了对边缘异构设备的自适应适配。</p>
+</li>
+<li><p><strong>首次构建了联邦学习场景下的基础模型混合架构（MoFM）</strong> 创新性地将全局专家与本地专家组成双专家混合模型，通过带轻量化门控适配器的门控网络，智能分配双专家的决策权重，从根本上解决了非 IID 数据带来的个性化与泛化性平衡难题，是首个在个性化联邦学习中实现多基础模型混合协同的工作。</p>
+</li>
+<li><p><strong>完成了全面的实验验证与性能突破</strong> 通过多数据集、多异构程度、多主干模型的大量对比实验，验证了 FedFMSL 的通用性与优越性：仅微调不到 0.3% 的基础模型参数，在默认设置下较其他 SOTA 基线性能最高提升 59.19%，同时节省 99.95% 的通信带宽，实现了参数效率与模型性能的双重突破。</p>
+</li>
+</ol>
+<h2 id="四、核心方法"><a href="#四、核心方法" class="headerlink" title="四、核心方法"></a>四、核心方法</h2><h3 id="整体架构：FedFMSL-两阶段训练范式"><a href="#整体架构：FedFMSL-两阶段训练范式" class="headerlink" title="整体架构：FedFMSL 两阶段训练范式"></a>整体架构：FedFMSL 两阶段训练范式</h3><p>FedFMSL 面向典型的横向联邦学习场景（N 个客户端，本地私有非 IID 数据集），整体分为<strong>全局专家训练</strong>与<strong>个性化本地专家训练</strong>两个阶段，核心流程如下图所示：</p>
+<ol>
+<li><p><strong>第一阶段：全局专家协同训练</strong></p>
+<ol>
+<li><p>操作：为每个客户端的基础模型（如 CLIP）的每一个 Transformer 块插入 LoRA 低秩分解矩阵，冻结预训练主干权重，仅更新 LoRA 参数；每轮通信中，客户端仅上传 LoRA 参数至服务器，完成加权聚合后下发更新。</p>
+</li>
+<li><p>核心目标：激活所有插入的 LoRA 矩阵，充分学习跨客户端的全局通用特征，训练完成的模型作为第二阶段的<strong>全局专家</strong>，全程冻结权重。</p>
+</li>
+<li><p>优化目标： $$min <em>{w</em>{i}} \mathcal{F}&#x3D;\frac{1}{N} \sum_{i&#x3D;1}^{N} \mathbb{E}<em>{\left(x</em>{i}, y_{i}\right) \sim d_{i}} \mathcal{F}<em>{i}\left(x</em>{i}, y_{i} ; w_{i}\right$$ 其中，$$w_$$为客户端 i 的 LoRA 参数，$$\mathcal{F}<em>$$为客户端 i 的损失函数，$$d</em>$$为客户端 i 的数据分布。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>第二阶段：个性化本地专家训练</strong></p>
+<ol>
+<li><p>操作：为每个客户端构建<strong>基础模型混合架构（MoFM）</strong>，包含第一阶段训练的全局专家、同架构的本地专家（全局专家权重初始化）、带门控适配器的门控网络。全局专家权重全程冻结，本地专家仅在客户端本地用 SAL 算法训练，不参与全局聚合；仅门控适配器的激活参数参与每轮通信的聚合与下发。</p>
+</li>
+<li><p>核心目标：平衡全局泛化能力与本地个性化适配能力，解决非 IID 数据带来的性能衰减问题，同时通过稀疏激活与门控适配器设计，进一步降低计算与通信开销。</p>
+</li>
+<li><p>优化目标： $$min <em>{e</em>{i}, u_{i}} \mathcal{L}&#x3D;\frac{1}{N} \sum_{i&#x3D;1}^{N} \mathbb{E}<em>{\left(x</em>{i}, y_{i}\right) \sim d_{i}} \mathcal{L}<em>{i}\left(x</em>{i}, y_{i} ; e_{i}, u_{i}\right$$ 其中，$$e_$$为客户端 i 的本地专家 LoRA 参数，$$u_$$为客户端 i 的门控适配器参数。</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="核心模块-1：稀疏激活-LoRA（SAL）算法"><a href="#核心模块-1：稀疏激活-LoRA（SAL）算法" class="headerlink" title="核心模块 1：稀疏激活 LoRA（SAL）算法"></a>核心模块 1：稀疏激活 LoRA（SAL）算法</h3><ol>
+<li><p><strong>基础原理</strong> 在基础模型的视觉编码器、文本编码器的每一层权重矩阵$$W_0 \in R^{E×F$$中，插入可训练的低秩分解矩阵$$\Delta W &#x3D; W_A W_$$，其中$$W_A \in R^{E×H$$、$$W_B \in R^{H×F$$，且秩$$H &lt;&lt; min(E,F$$。冻结主干权重$$W_$$，仅优化$$W_$$与$$W_$$，前向传播计算为： $$y&#x3D;(W_{0}+W_{A}W_{B})$$ 该设计大幅压缩了可训练参数量，从根源上降低了计算与通信开销。</p>
+</li>
+<li><p><strong>渐进式稀疏激活机制</strong> 基于 “深层网络低层提取通用特征、高层提取个性化 &#x2F; 任务特征” 的先验知识，设计了从高层到低层的渐进式激活策略，核心通过<strong>能力队列 + 精度阈值控制器</strong>实现：</p>
+<ol>
+<li><p>设计最大长度为 Q 的能力队列（Capability Queue），每轮通信后将客户端的图像分类准确率存入队列，队列满后自动弹出最早的历史数据。</p>
+</li>
+<li><p>设定精度阈值$$\delt$$，计算客户端 j 在第 i 轮通信的精度增量： $$\Delta_{i, j}&#x3D;A c c_{i, j}-\frac{1}{Q} \sum_{t&#x3D;i-Q}^{i-1} A c c_{t, j$$</p>
+</li>
+<li><p>若$$\Delta_{i,j} &lt; \delt$$，判定模型训练进入瓶颈，自动激活下一层的 LoRA 矩阵，增加可训练参数量以突破性能瓶颈。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>核心优势</strong> 遵循课程学习的思路，逐步提升模型优化难度，提升训练稳定性；同时可根据客户端算力、数据集难度自适应调整激活的参数量，完美适配资源受限的边缘异构设备，避免了固定参数量配置的资源浪费或性能不足问题。</p>
+</li>
+</ol>
+<h3 id="核心模块-2：基础模型混合架构（MoFM）"><a href="#核心模块-2：基础模型混合架构（MoFM）" class="headerlink" title="核心模块 2：基础模型混合架构（MoFM）"></a>核心模块 2：基础模型混合架构（MoFM）</h3><ol>
+<li><p><strong>双专家核心架构</strong> 为每个客户端构建 “全局专家 + 本地专家” 的双专家混合模型，其中：</p>
+<ol>
+<li><p>全局专家：第一阶段训练完成的基础模型，权重全程冻结，负责提取通用特征，保证模型的跨客户端泛化能力；</p>
+</li>
+<li><p>本地专家：与全局专家同架构，由全局专家权重初始化，仅在客户端本地通过 SAL 算法训练，不参与全局聚合，负责提取客户端本地个性化特征，适配非 IID 数据分布。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>门控权重分配机制</strong> 设计门控网络输出 0-1 之间的混合权重，智能平衡双专家的决策贡献。设全局专家提取的图像 &#x2F; 文本特征为$$V_g、T_$$，本地专家提取的特征为$$V_i、T_$$，最终模型输出的余弦相似度为： $$\overline{O}<em>{i}&#x3D;\lambda</em>{i}+\left(1-\lambda_{i}\right) 其中$$\lambda_i \in (0,1$$为门控网络输出的混合权重，$$\lambda_$$越大，模型越依赖全局通用知识，反之越依赖本地个性化知识。</p>
+</li>
+<li><p><strong>轻量化门控适配器设计</strong> 为进一步降低通信开销，设计了极简的门控适配器插入门控网络，核心结构为：MLP→批归一化层→MLP→批归一化层→Softmax，最终输出 0-1 的混合权重。</p>
+<ol>
+<li><p>训练策略：第二阶段仅优化本地专家与门控适配器，冻结门控网络主干与全局专家；</p>
+</li>
+<li><p>聚合策略：每轮通信中，仅客户端的门控适配器激活参数上传至服务器，按客户端数据集大小加权聚合： $$u_{global }&#x3D;\frac{\left|\mathcal{D}<em>{i}\right|}{\sum</em>{i&#x3D;0}^{N}\left|\mathcal{D}<em>{i}\right|} \sum</em>{i&#x3D;1}^{N} u_{i$$ 聚合后的全局门控适配器参数下发至所有客户端，实现全局数据分布的学习。</p>
+</li>
+<li><p>效果：仅微调门控适配器，准确率仅比全门控参数微调低 0.05%，但通信资源消耗降低 97.69%，实现了极致的参数效率。</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="收敛性分析"><a href="#收敛性分析" class="headerlink" title="收敛性分析"></a>收敛性分析</h3><p>论文分两个阶段完成了算法的收敛性理论证明，均采用联邦学习领域通用的标准假设：</p>
+<ol>
+<li><p><strong>第一阶段收敛性证明</strong> 基于损失函数 L - 平滑、梯度平方期望有界的标准假设，通过梯度下降迭代推导，证明了当学习率$$\gamma&#x3D;\frac{\sqrt{\frac{1}{T}}}{\Omega$$（Ω 为常数）时，算法的收敛速率为$$O(\frac{1}{\sqrt{T}}$$，与经典联邦优化算法的收敛速率保持一致。</p>
+</li>
+<li><p><strong>第二阶段收敛性证明</strong> 引入损失函数关于本地专家参数、门控适配器参数的 Lipschitz 连续性假设，以及双变量梯度有界性假设，通过平滑性不等式与迭代推导，给出了算法的收敛上界，证明了双变量联合优化下的算法收敛性，为第二阶段个性化训练的理论有效性提供了支撑。</p>
+</li>
+</ol>
+<h2 id="五、实验验证"><a href="#五、实验验证" class="headerlink" title="五、实验验证"></a>五、实验验证</h2><h3 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h3><ol>
+<li><p><strong>数据集</strong>：选用 CLIP 模型经典的 3 个图像分类数据集，覆盖不同任务难度：</p>
+<ol>
+<li><p>Food101：101 类食物分类任务；</p>
+</li>
+<li><p>EuroSAT：10 类遥感地物分类任务；</p>
+</li>
+<li><p>UCF101：101 类视频帧人类动作分类任务。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>基线模型</strong>：</p>
+<ol>
+<li><p>主流对比基线：Vanilla Fine-Tuning (FT)、PromptFL、LayerFreeze Fine-Tuning (LFFT)；</p>
+</li>
+<li><p>消融实验基线：LoRA+FL、Adapter+FL、无 MoFM 架构的单流模型、全门控参数微调模型。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>默认配置</strong>：主干模型为 CLIP ViT-B&#x2F;16，batch size&#x3D;512，学习率 &#x3D; 2e-4，客户端数量 &#x3D; 10，LoRA 秩 r&#x3D;1，dropout&#x3D;0.1，两阶段各 25 轮通信；非 IID 数据划分遵循 Dirichlet 分布，通过 α 参数控制异构程度（α 越小，异构性越强）。</p>
+</li>
+</ol>
+<h3 id="核心实验结果"><a href="#核心实验结果" class="headerlink" title="核心实验结果"></a>核心实验结果</h3><ol>
+<li><p><strong>综合性能对比</strong> FedFMSL 在所有异构程度、客户端数量、主干模型下，均取得了最高的分类准确率：</p>
+<ol>
+<li><p>非 IID 场景下，α&#x3D;1 时，较其他 SOTA 基线，在 Food101 最高提升 9.45%，UCF101 最高提升 22.18%，EuroSAT 最高提升 59.19%；</p>
+</li>
+<li><p>平均准确率较 FT、PromptFL、LFFT 分别提升 20.40%、29.90%、11.11%；</p>
+</li>
+<li><p>通用性验证：在 ALBEF 多模态基础模型上，较其他基线准确率增益最高达 38.85%，证明了算法对不同 Transformer 架构基础模型的适配性。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>资源消耗对比</strong></p>
+<ol>
+<li><p><strong>参数量效率</strong>：仅微调不到 0.3% 的基础模型参数，第一阶段仅 0.1%（153K），第二阶段仅 0.134%（417K）；而 FT 微调 100% 参数，LFFT 微调 65.78% 参数；PromptFL 虽仅微调 0.0054% 参数，但伴随严重的性能下降。</p>
+</li>
+<li><p><strong>通信效率</strong>：0.1MB&#x2F;s 低带宽下，FedFMSL 单轮通信仅需 8.34 秒，较 FT 算法节省 99.95% 的通信时间；真实移动网络轨迹下，单轮通信仅 0.31 秒，远低于 FT 的 210 秒、LFFT 的 138 秒。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>消融实验结果</strong></p>
+<ol>
+<li><p><strong>MoFM 架构有效性</strong>：带 MoFM 的 ViT-B&#x2F;16 模型，参数量比无 MoFM 的 ViT-L&#x2F;14 模型少 27.33%，但平均准确率仍提升 1.98%，证明双专家架构能以更低的参数量实现更优的性能。</p>
+</li>
+<li><p><strong>SAL 算法有效性</strong>：较纯 LoRA+FL、Adapter+FL 基线，在三个数据集上准确率增益最高分别达 6.97%、14.55%、9.48%，且能根据数据集难度自适应调整激活的 LoRA 层数。</p>
+</li>
+<li><p><strong>门控适配器有效性</strong>：仅微调门控适配器，准确率仅比全门控参数微调低 0.05%，但通信资源节省 97.69%，验证了轻量化设计的合理性。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>超参数鲁棒性分析</strong> 论文还分析了学习率、精度阈值 δ、LoRA 秩、dropout、权重衰减等超参数对模型性能的影响，验证了算法在宽超参数区间内的鲁棒性，并给出了不同场景下的最优配置建议。</p>
+</li>
+</ol>
+<h2 id="六、结论与未来工作"><a href="#六、结论与未来工作" class="headerlink" title="六、结论与未来工作"></a>六、结论与未来工作</h2><h3 id="核心结论"><a href="#核心结论" class="headerlink" title="核心结论"></a>核心结论</h3><ol>
+<li><p>提出的两阶段 FedFMSL 算法，系统性解决了基础模型联邦学习中的通信密集、计算密集、客户端数据异构三大核心挑战，实现了参数效率与模型性能的双重突破。</p>
+</li>
+<li><p>第一阶段通过全激活 LoRA 协同训练全局专家，仅传输 LoRA 参数，相比全参数传输节省 99.9% 以上的通信带宽；第二阶段的 MoFM 双专家架构，通过门控适配器实现了全局泛化性与本地个性化的精准平衡，仅聚合门控适配器参数即可达到 SOTA 性能。</p>
+</li>
+<li><p>设计的 SAL 算法，通过渐进式稀疏激活 LoRA 矩阵，完美适配边缘设备的算力约束，仅微调不到 0.3% 的基础模型参数，性能较 SOTA 基线最高提升 59.19%。</p>
+</li>
+<li><p>大量实验验证了算法在不同数据集、异构程度、客户端数量、基础模型主干下的有效性、通用性与鲁棒性，具备极强的边缘场景落地潜力。</p>
+</li>
+</ol>
+<h3 id="未来工作"><a href="#未来工作" class="headerlink" title="未来工作"></a>未来工作</h3><ol>
+<li><p>引入模型量化技术，进一步降低参数规模与计算通信开销，探索自适应量化策略，根据数据特征与模型需求动态调整量化等级。</p>
+</li>
+<li><p>在更广泛的数据集、更大规模的客户端集群上开展实验，进一步验证算法的扩展性与有效性。</p>
+</li>
+<li><p>探索算法在大语言模型（LLM）、多模态生成模型等更多类型基础模型上的适配性，拓展联邦学习 + 基础模型的应用场景。</p>
+</li>
+</ol>
+<h2 id="七、关键亮点与思考"><a href="#七、关键亮点与思考" class="headerlink" title="七、关键亮点与思考"></a>七、关键亮点与思考</h2><h3 id="核心亮点"><a href="#核心亮点" class="headerlink" title="核心亮点"></a>核心亮点</h3><ol>
+<li><p><strong>系统性解决三大核心痛点</strong>：区别于现有工作仅聚焦单一问题的优化，FedFMSL 通过两阶段架构 + SAL 算法解决通信与计算开销问题，通过 MoFM 双专家架构解决数据异构问题，是基础模型联邦学习领域少有的全链路优化方案。</p>
+</li>
+<li><p><strong>极致的参数效率与性能平衡</strong>：打破了 “低参微调必然伴随性能损失” 的固有认知，在仅微调不到 0.3% 参数量的前提下，实现了远超全参数微调、Prompt Tuning 等方案的性能，为边缘设备的大模型联邦微调提供了可行的落地方案。</p>
+</li>
+<li><p><strong>理论与实验双轮驱动</strong>：不仅完成了两阶段算法的收敛性理论证明，还通过超百组对比实验、消融实验，全面验证了各模块的有效性，结论严谨扎实，可复现性强。</p>
+</li>
+<li><p><strong>强通用性与可扩展性</strong>：算法核心设计不依赖特定基础模型架构，可迁移至所有 Transformer 架构的大模型，适配 CV、NLP、多模态等多种任务场景。</p>
+</li>
+</ol>
+<h3 id="研究启发与思考"><a href="#研究启发与思考" class="headerlink" title="研究启发与思考"></a>研究启发与思考</h3><ol>
+<li><p><strong>个性化联邦学习的新范式</strong>：MoFM 双专家架构为大模型个性化联邦学习提供了全新思路，区别于传统 “全局模型 + 本地后微调” 的单流模式，双专家并行 + 门控动态权重的设计，能更好地适配非 IID 数据分布，为后续相关研究提供了重要参考。</p>
+</li>
+<li><p><strong>边缘大模型训练的轻量化新思路</strong>：SAL 算法的渐进式激活机制，为资源受限设备的大模型训练提供了 “按需分配” 的优化思路，替代了固定参数量的静态配置，可进一步拓展至大模型的边缘推理、增量微调等场景。</p>
+</li>
+<li><p><strong>落地价值与优化空间</strong>：算法在极低的资源开销下实现了 SOTA 性能，在移动端、物联网、智慧医疗等隐私敏感的边缘场景中具备极高的工程落地价值；后续可进一步融合差分隐私、同态加密等隐私增强技术，在保证性能的同时进一步提升数据隐私安全。</p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io">Fash0o0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/">https://fash0o0.github.io/2026/03/19/【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://fash0o0.github.io" target="_blank">Fash的回忆簿</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0/">联邦学习</a><a class="post-meta__tags" href="/tags/Non-IID/">Non-IID</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">论文笔记</a><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/PEFT/">PEFT</a><a class="post-meta__tags" href="/tags/LoRA/">LoRA</a></div><div class="post-share"><div class="social-share" data-image="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/" title="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FlyLoRA: Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts（arXiv:2510.08396v2）  作者及单位：  Heming Zou, Wutong Xu, Yao Zhu, Xiangyang Ji（清华大学自动化系）  Yunliang Zang（天津大学医学工程与转化医学研究院）    发表时间：2025 年 10 月（NeurIPS 2025）  代码开源地址：https://github.com&#x2F;gfyddha&#x2F;FlyLoRA  核心定位：针对低秩适配（LoRA）存在的任务内 &#x2F; 任务间参数干扰、现有 MoE-based LoRA 路由参数开销大的核心痛点，受果蝇嗅觉神经回路启发，提出隐式秩级专家混合的 FlyLoRA 框架，同时实现高效的单任务内解耦与多任务间解耦，在更低的参数与计算开销下，全面提升大模型微调与多任务合并的性能。   二、研究背景与核心问题 大模型微调的...</div></div></div></a><a class="pagination-related" href="/2026/03/06/%E3%80%90AAAI-2026-%E4%BD%9B%E7%BD%97%E9%87%8C%E8%BE%BE%E5%A4%A7%E5%AD%A6%E3%80%91FedALT%EF%BC%9AFederated%20Fine-Tuning%20through%20Adaptive%20Local%20Training%20with%20Rest-of-World%20LoRA/" title="【AAAI-2026-佛罗里达大学】FedALT：Federated Fine-Tuning through Adaptive Local Training with Rest-of-World LoRA"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">【AAAI-2026-佛罗里达大学】FedALT：Federated Fine-Tuning through Adaptive Local Training with Rest-of-World LoRA</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FedALT: Federated Fine-Tuning through Adaptive Local Training with Rest-of-World LoRA  作者及单位：Jieming Bian、Lei Wang、Jie Xu（佛罗里达大学）；Letian Zhang（中田纳西州立大学）  发表时间：2026-03-14（AAAI Conference on Artificial Intelligence）  代码开源地址：暂未开源  核心定位：针对联邦大模型微调场景下，基于 FedAvg 的联邦 LoRA 方法存在的跨客户端有害干扰、全局与本地信息平衡能力不足的核心痛点，提出完全脱离 FedAvg 范式的 FedALT 个性化联邦 LoRA 微调框架，在异构任务场景下实现了更优的本地适配效果，同时不牺牲计算与通信效率。   二、研究背景与核心问题研究背景 大语言模型 (LLM) 适配下游任务需微调，但全参数微调计算成本极高，以 LoRA 为代表的参数高效微调 (PEFT) 方法，通过低秩矩阵分解大幅压缩可训练参数量，成为大模型适配的主流方...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/01/19/%E3%80%90NeurIPS-2025-%E4%BD%9B%E7%BD%97%E9%87%8C%E8%BE%BE%E5%A4%A7%E5%AD%A6%E3%80%91Adaptive%20LoRA%20Experts%20Allocation%20and%20Selection%20for%20Federated%20Fine-Tuning/" title="【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-19</div><div class="info-item-2">【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息标题：Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning（https://arxiv.org/abs/2509.15087v2） 作者及单位：Lei Wang (University of Florida), Jieming Bian (University of Florida), Letian Zhang (Middle Tennessee State University), Jie Xu (University of Florida) 发表时间：2025年（NeurIPS 2025） 代码开源地址：lei-wang-link&#x2F;FedLEASE 核心定位：针对联邦学习中语言模型微调的异构客户端问题，提出FedLEASE框架，通过自适应专家分配和选择机制，实现高效、隐私保护的联邦微调。 二、研究背景与核心问题大型语言模型(LLMs)在各种任务中表现出色，但针对特定领域应用的微调通常需要大量领域特定数据，这些数据可能分布在多个组织中。联邦学习(FL)提供了一种...</div></div></div></a><a class="pagination-related" href="/2025/12/05/%E3%80%90arXiv-2024-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91FeDeRA%EF%BC%9AEfficient%20Fine-tuning%20of%20Language%20Models%20in%20Federated/" title="【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-05</div><div class="info-item-2">【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition</div></div><div class="info-2"><div class="info-item-1">前置笔记：矩阵奇异值分解（SVD） 一、论文基本信息 标题：FeDeRA: Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition 作者及单位：Yuxuan Yan, Shunpu Tang, Zhiguo Shi, Qianqian Yang（浙江大学信息与电子工程学院） 发表时间：2024年5月（arXiv预印本） 代码开源地址：[暂未开源] 核心定位：针对联邦学习微调PLMs面临non-IID数据导致PEFT性能严重下降的问题，提出通过SVD提取预训练权重的主成分来初始化低秩适配器。  二、研究背景与核心问题研究背景：  预训练语言模型（PLMs）的隐私挑战：PLMs在各类NLP任务上表现出卓越性能，但集中式微调需要聚合所有数据，引发严重的数据隐私担忧。联邦学习（FL）作为分布式协作训练范式，可在不共享原始数据的情况下联合训练模型，成为解决隐私问题的有效方案。 资源约束瓶颈：PLMs参数规模达数十亿甚至百亿级，在FL场景下频繁交换完整模型参数...</div></div></div></a><a class="pagination-related" href="/2026/01/27/%E3%80%90arXiv-2025-%E7%BE%8E%E5%9B%BD%E5%9C%A3%E6%AF%8D%E5%A4%A7%E5%AD%A6%E3%80%91FLAME%EF%BC%9ATowards%20Federated%20Fine%20-%20Tuning%20Large%20Language%20Models%20Through%20Adaptive%20SMoE/" title="【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-27</div><div class="info-item-2">【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FLAME: Towards Federated Fine-Tuning Large Language Models Through Adaptive SMoE 作者及单位：Khiem Le¹, Tuan Tran², Ting Hua¹, Nitesh V. Chawla¹；¹ 美国圣母大学，² 爱尔兰都柏林圣三一学院 发表时间：2025 年 07 月 14 日（arXiv 预印本）   代码开源地址：暂未开源 核心定位：针对资源自适应联邦微调中 LoRA 矩阵压缩导致的性能损失、无法真正适配客户端异构算力的核心痛点，提出基于自适应稀疏混合专家（SMoE）的 FLAME 联邦学习框架，在保留完整全局 LoRA 矩阵的前提下，通过调整客户端激活专家数量实现真实算力适配，同时解决输出量级不匹配和专家训练质量失衡问题，显著提升异构场景下联邦微调的性能与效率。  二、研究背景与核心问题研究背景【arXiv-2025-美国圣母大学】FLAME: Towards Federated Fine-Tuning Large Language Models Through ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Fash0o0</div><div class="author-info-description">在码头等火车</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Fash0o0"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">享受活着的每一天</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AE%BA%E6%96%87%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">一、论文基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF%E4%B8%8E%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">二、研究背景与核心问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF"><span class="toc-number">2.1.</span> <span class="toc-text">研究背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.2.</span> <span class="toc-text">核心问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A0%B8%E5%BF%83%E8%B4%A1%E7%8C%AE"><span class="toc-number">3.</span> <span class="toc-text">三、核心贡献</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">四、核心方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%EF%BC%9AFedFMSL-%E4%B8%A4%E9%98%B6%E6%AE%B5%E8%AE%AD%E7%BB%83%E8%8C%83%E5%BC%8F"><span class="toc-number">4.1.</span> <span class="toc-text">整体架构：FedFMSL 两阶段训练范式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97-1%EF%BC%9A%E7%A8%80%E7%96%8F%E6%BF%80%E6%B4%BB-LoRA%EF%BC%88SAL%EF%BC%89%E7%AE%97%E6%B3%95"><span class="toc-number">4.2.</span> <span class="toc-text">核心模块 1：稀疏激活 LoRA（SAL）算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97-2%EF%BC%9A%E5%9F%BA%E7%A1%80%E6%A8%A1%E5%9E%8B%E6%B7%B7%E5%90%88%E6%9E%B6%E6%9E%84%EF%BC%88MoFM%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">核心模块 2：基础模型混合架构（MoFM）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E6%95%9B%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-number">4.4.</span> <span class="toc-text">收敛性分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%AE%9E%E9%AA%8C%E9%AA%8C%E8%AF%81"><span class="toc-number">5.</span> <span class="toc-text">五、实验验证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="toc-number">5.1.</span> <span class="toc-text">实验设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">5.2.</span> <span class="toc-text">核心实验结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%BB%93%E8%AE%BA%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.</span> <span class="toc-text">六、结论与未来工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%BB%93%E8%AE%BA"><span class="toc-number">6.1.</span> <span class="toc-text">核心结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.2.</span> <span class="toc-text">未来工作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%85%B3%E9%94%AE%E4%BA%AE%E7%82%B9%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">7.</span> <span class="toc-text">七、关键亮点与思考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E4%BA%AE%E7%82%B9"><span class="toc-number">7.1.</span> <span class="toc-text">核心亮点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E5%90%AF%E5%8F%91%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">7.2.</span> <span class="toc-text">研究启发与思考</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/10/%E3%80%90arXiv-2025-%E5%A4%A9%E6%B4%A5%E5%A4%A7%E5%AD%A6%E3%80%91ILoRA%EF%BC%9AFederated%20Learning%20with%20Low-Rank%20Adaptation%20for%20Heterogeneous%20Client%20Aggregation/" title="【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation">【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation</a><time datetime="2026-04-10T01:31:23.000Z" title="发表于 2026-04-10 09:31:23">2026-04-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/" title="【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</a><time datetime="2026-04-03T01:31:23.000Z" title="发表于 2026-04-03 09:31:23">2026-04-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90TMLR-2026-%E6%BE%B3%E9%97%A8%E5%A4%A7%E5%AD%A6%E3%80%91A%20Survey%20on%20Federated%20Fine-Tuning%20of%20Large%20Language%20Models/" title="【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models">【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models</a><time datetime="2026-03-20T15:45:34.000Z" title="发表于 2026-03-20 23:45:34">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/" title="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</a><time datetime="2026-03-20T03:31:23.000Z" title="发表于 2026-03-20 11:31:23">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</a><time datetime="2026-03-19T15:45:34.000Z" title="发表于 2026-03-19 23:45:34">2026-03-19</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2026 By Fash0o0</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="/"></script></div></body></html>

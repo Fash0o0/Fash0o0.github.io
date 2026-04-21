@@ -1,0 +1,389 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【CVPR-2025-吉林大学】FedAWA：Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors | Fash的回忆簿</title><meta name="author" content="Fash0o0"><meta name="copyright" content="Fash0o0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、论文基本信息 标题：FedAWA: Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors  作者及单位：  Changlong Shi, Bingjie Zhang, Dandan Guo, Yi Chang（吉林大学）  He Zhao（CSIRO’s Data61，澳大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【CVPR-2025-吉林大学】FedAWA：Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors">
+<meta property="og:url" content="https://fash0o0.github.io/2025/12/11/%E3%80%90CVPR-2025-%E5%90%89%E6%9E%97%E5%A4%A7%E5%AD%A6%E3%80%91FedAWA%EF%BC%9AAdaptive-Optimization-of-Aggregation-Weights-in-Federated-Learning-Using-Client-Vectors/index.html">
+<meta property="og:site_name" content="Fash的回忆簿">
+<meta property="og:description" content="一、论文基本信息 标题：FedAWA: Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors  作者及单位：  Changlong Shi, Bingjie Zhang, Dandan Guo, Yi Chang（吉林大学）  He Zhao（CSIRO’s Data61，澳大">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp">
+<meta property="article:published_time" content="2025-12-11T15:45:34.000Z">
+<meta property="article:modified_time" content="2026-04-21T08:56:39.976Z">
+<meta property="article:author" content="Fash0o0">
+<meta property="article:tag" content="Non-IID">
+<meta property="article:tag" content="联邦学习">
+<meta property="article:tag" content="聚合权重优化">
+<meta property="article:tag" content="论文笔记">
+<meta property="article:tag" content="隐私保护">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【CVPR-2025-吉林大学】FedAWA：Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors",
+  "url": "https://fash0o0.github.io/2025/12/11/%E3%80%90CVPR-2025-%E5%90%89%E6%9E%97%E5%A4%A7%E5%AD%A6%E3%80%91FedAWA%EF%BC%9AAdaptive-Optimization-of-Aggregation-Weights-in-Federated-Learning-Using-Client-Vectors/",
+  "image": "https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp",
+  "datePublished": "2025-12-11T15:45:34.000Z",
+  "dateModified": "2026-04-21T08:56:39.976Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Fash0o0",
+      "url": "https://fash0o0.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://fash0o0.github.io/2025/12/11/%E3%80%90CVPR-2025-%E5%90%89%E6%9E%97%E5%A4%A7%E5%AD%A6%E3%80%91FedAWA%EF%BC%9AAdaptive-Optimization-of-Aggregation-Weights-in-Federated-Learning-Using-Client-Vectors/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【CVPR-2025-吉林大学】FedAWA：Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E5%9B%BE.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Fash的回忆簿</span></a><a class="nav-page-title" href="/"><span class="site-name">【CVPR-2025-吉林大学】FedAWA：Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">【CVPR-2025-吉林大学】FedAWA：Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-12-11T15:45:34.000Z" title="发表于 2025-12-11 23:45:34">2025-12-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-21T08:56:39.976Z" title="更新于 2026-04-21 16:56:39">2026-04-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0/">联邦学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="一、论文基本信息"><a href="#一、论文基本信息" class="headerlink" title="一、论文基本信息"></a>一、论文基本信息</h2><ul>
+<li><p><strong>标题</strong>：FedAWA: Adaptive Optimization of Aggregation Weights in Federated Learning Using Client Vectors</p>
+</li>
+<li><p><strong>作者及单位</strong>：</p>
+<ul>
+<li><p>Changlong Shi, Bingjie Zhang, Dandan Guo, Yi Chang（吉林大学）</p>
+</li>
+<li><p>He Zhao（CSIRO’s Data61，澳大利亚）</p>
+</li>
+<li><p>Mingyuan Zhou（德克萨斯大学奥斯汀分校，美国）</p>
+</li>
+</ul>
+</li>
+<li><p><strong>发表时间</strong>：2025 年（CVPR 2025）</p>
+</li>
+<li><p><strong>代码开源地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/ChanglongShi/FedAWA">https://github.com&#x2F;ChanglongShi&#x2F;FedAWA</a></p>
+</li>
+<li><p><strong>核心定位</strong>：针对联邦学习中数据异构导致的聚合权重适配性差、收敛不稳定、部分方法存在隐私风险的核心痛点，提出基于客户端向量的自适应权重聚合方法 FedAWA，在不依赖额外代理数据、不泄露隐私的前提下动态优化聚合权重，显著提升全局模型的收敛稳定性与泛化性能。</p>
+</li>
+</ul>
+<h2 id="二、研究背景与核心问题"><a href="#二、研究背景与核心问题" class="headerlink" title="二、研究背景与核心问题"></a>二、研究背景与核心问题</h2><p>联邦学习（FL）是一种隐私优先的分布式机器学习框架，支持多客户端协同训练全局模型，全程无需共享本地原始数据，已在医疗、金融、教育等领域得到广泛应用。但该框架仍面临以下核心挑战与问题：</p>
+<ol>
+<li><p><strong>数据异构的核心瓶颈</strong>：客户端间的用户行为、设备特性、数据分布存在显著差异（Non-IID），导致不同客户端的模型优化方向发散，传统 FedAvg 算法仅按本地数据集大小分配固定聚合权重，在异构场景下会出现收敛不稳定、全局模型性能严重下降的问题。</p>
+</li>
+<li><p><strong>现有聚合优化方法的固有缺陷</strong></p>
+<ul>
+<li><p>固定权重类方法（如 FedDisco）无法适配 FL 多轮迭代的动态训练过程，对异构场景的自适应能力不足；</p>
+</li>
+<li><p>直接相似度类方法（如 L-DAWA）用模型参数间的余弦相似度作为权重，无法充分捕捉客户端间的关联，对本地数据特征的刻画能力有限；</p>
+</li>
+<li><p>代理数据类方法（如 FedLAW）依赖与全局数据同分布的代理数据集优化权重，引入了数据泄露风险，违背了联邦学习的隐私核心诉求。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>跨领域方法的适配难题</strong>：模型合并领域的 Task Arithmetic 技术可在无原始数据的前提下实现模型聚合，与 FL 的隐私需求高度契合，但其本质是单步聚合，而 FL 是多轮通信、迭代更新的过程，无法直接迁移应用。</p>
+</li>
+</ol>
+<h2 id="三、核心贡献"><a href="#三、核心贡献" class="headerlink" title="三、核心贡献"></a>三、核心贡献</h2><ol>
+<li><p><strong>跨领域的理论关联探索</strong>：首次系统性探究了模型合并与联邦学习之间的内在关联，提出<strong>客户端向量（Client Vector）</strong> 的核心概念，验证了其能精准捕捉本地数据集的分布差异，为联邦学习聚合权重的优化提供了全新的可解释性依据。</p>
+</li>
+<li><p><strong>轻量化自适应聚合方法设计</strong>：提出了 FedAWA 及其分层优化版本 FedAWA-L，无需额外数据集、不要求客户端上传额外信息，仅在服务端即可完成聚合权重的动态自适应优化，在保障隐私安全的同时，有效缓解了数据异构带来的性能衰减问题。</p>
+</li>
+<li><p><strong>全场景的有效性验证</strong>：通过多维度、大规模的对比实验，验证了 FedAWA 在不同数据异构程度、模型架构、客户端数量、训练超参数的场景下，均能稳定超越主流基线方法；同时证明了其具备即插即用的模块化特性，可与现有联邦学习方法无缝集成，进一步提升模型性能。</p>
+</li>
+</ol>
+<h2 id="四、核心方法"><a href="#四、核心方法" class="headerlink" title="四、核心方法"></a>四、核心方法</h2><h3 id="4-1-前置基础概念"><a href="#4-1-前置基础概念" class="headerlink" title="4.1 前置基础概念"></a>4.1 前置基础概念</h3><h4 id="4-1-1-联邦学习基础流程"><a href="#4-1-1-联邦学习基础流程" class="headerlink" title="4.1.1 联邦学习基础流程"></a>4.1.1 联邦学习基础流程</h4><p>标准联邦学习包含 1 个中心服务器与 K 个客户端，第 t 轮通信中，全局模型参数记为$\theta_{g}^{t}$，客户端 k 的本地模型参数记为$\theta_{k}^{t}$，核心流程如下：</p>
+<ol>
+<li><p>服务器向所有参与客户端广播当前全局模型$\theta_{g}^{t}$；</p>
+</li>
+<li><p>每个客户端 k 基于私有数据集$D_k$，对$\theta_{g}^{t}$进行 E 轮本地训练，得到更新后的本地模型$\theta_{k}^{t}$；</p>
+</li>
+<li><p>所有客户端将本地模型$\theta_{k}^{t}$上传至服务器；</p>
+</li>
+<li><p>服务器对本地模型加权聚合，生成新一轮全局模型：$\theta_{g}^{t+1}&#x3D;\sum_{k&#x3D;1}^{K} \lambda_{k} \theta_{k}^{t}$，其中$\lambda_{k}$为客户端 k 的聚合权重，FedAvg 中$\lambda_{k}&#x3D;\frac{|D_{k}|}{\sum_{i&#x3D;1}^{K}|D_{i}|}$（仅由数据集大小决定）。</p>
+</li>
+</ol>
+<h4 id="4-1-2-Task-Arithmetic-核心思想"><a href="#4-1-2-Task-Arithmetic-核心思想" class="headerlink" title="4.1.2 Task Arithmetic 核心思想"></a>4.1.2 Task Arithmetic 核心思想</h4><p>Task Arithmetic 是模型合并领域的经典方法，其核心是<strong>任务向量（Task Vector）</strong>，定义为微调后模型与预训练模型的参数差：$\tau_{k}&#x3D;\theta_{k}^{<em>}-\theta_{0}$，其中$\theta_{0}$为预训练模型参数，$\theta_{k}^{</em>}$为下游任务微调后的模型参数。该方法可通过对任务向量的算术操作实现多模型聚合，无需访问原始训练数据，与联邦学习的隐私需求高度契合，但其单步聚合的特性与 FL 多轮迭代的训练流程存在本质差异，无法直接复用。</p>
+<h3 id="4-2-核心经验观察与动机"><a href="#4-2-核心经验观察与动机" class="headerlink" title="4.2 核心经验观察与动机"></a>4.2 核心经验观察与动机</h3><p>基于 Task Arithmetic 的思想，本文提出<strong>客户端向量</strong>的定义：第 t 轮通信中，客户端 k 的客户端向量为本地训练后模型与本轮初始全局模型的参数差，即$\tau_{k}^{t}&#x3D;\theta_{k}^{t}-\theta_{g}^{t}$；聚合后的全局向量为$\tau_{g}^{t}&#x3D;\sum_{k&#x3D;1}^{K} \lambda_{k}^{t} \tau_{k}^{t}$，其中$\lambda_{k}^{t}$为第 t 轮可学习的聚合权重。</p>
+<p>通过实验，本文得到两个核心经验结论，构成了方法的核心动机：</p>
+<ol>
+<li><p><strong>客户端向量可精准刻画本地数据异构特征</strong>：客户端向量之间的差异，与对应本地数据集之间的分布差异高度匹配；而原始模型参数的差异，无法有效反映本地数据集的关联关系。相比直接使用模型整体参数，客户端向量能更精准地捕捉本地数据的分布信息。</p>
+</li>
+<li><p><strong>聚合全局向量与理想更新方向高度一致</strong>：定义理想向量$\tau_{ideal }^{t}&#x3D;\theta_{ideal }^{t}-\theta_{g}^{t}$，其中$\theta_{ideal }^{t}$是用所有客户端的全局数据集$D_g&#x3D;D_1\cup D_2\cup…\cup D_K$训练得到的模型参数（FL 场景下无法直接获取，仅用于理论分析）。实验发现，聚合后的全局向量$\tau_{g}^{t}$，比任意单个客户端向量更接近理想向量，说明聚合客户端向量可得到反映全局数据分布的伪全局向量，能够作为聚合权重优化的核心指导信号。</p>
+</li>
+</ol>
+<h3 id="4-3-FedAWA-核心算法设计"><a href="#4-3-FedAWA-核心算法设计" class="headerlink" title="4.3 FedAWA 核心算法设计"></a>4.3 FedAWA 核心算法设计</h3><p>FedAWA 的核心逻辑是：为客户端向量与全局向量方向更一致的客户端分配更高的聚合权重，降低方向偏离的客户端权重，最小化聚合全局向量与理想更新方向的偏差，从而优化全局模型的更新轨迹，提升收敛稳定性与泛化性能。</p>
+<h4 id="4-3-1-基础优化目标函数"><a href="#4-3-1-基础优化目标函数" class="headerlink" title="4.3.1 基础优化目标函数"></a>4.3.1 基础优化目标函数</h4><p>初始优化目标以客户端向量与全局向量的二范数距离为核心，约束聚合权重的 L1 范数为 1（保证权重和为 1，符合 FL 聚合的基本规则），公式如下：<br>$\lambda^{t}&#x3D;arg min <em>{\lambda}\left(\sum</em>{k&#x3D;1}^{K} \lambda_{k}\left| \tau_{k}^{t}-\tau_{g}^{t}\right| _{2}\right), s.t. | \lambda| _{1}&#x3D;1$<br>该目标函数会自动为与全局更新方向更一致的客户端分配更高权重，抑制方向偏离的客户端对全局模型的负面影响。</p>
+<h4 id="4-3-2-带全局对齐正则项的最终目标函数"><a href="#4-3-2-带全局对齐正则项的最终目标函数" class="headerlink" title="4.3.2 带全局对齐正则项的最终目标函数"></a>4.3.2 带全局对齐正则项的最终目标函数</h4><p>为了防止聚合后的全局模型与上一轮全局模型偏离过大，保证训练过程的稳定性，本文加入了全局对齐正则项，最终优化目标如下：<br>$\lambda^{t}&#x3D;\underset{\lambda}{arg min }\left(\sum_{k&#x3D;1}^{K} \lambda_{k}\left| \tau_{k}^{t}-\tau_{g}^{t}\right| <em>{2}+d\left(\sum</em>{k&#x3D;1}^{K} \lambda_{k} \theta_{k}^{t}, \theta_{g}^{t}\right)\right), s.t. | \lambda| <em>{1}&#x3D;1$<br>其中$d(\cdot, \cdot)$为距离函数，本文采用<strong>1 - 余弦相似度</strong>实现。相比无界的欧氏距离，1 - 余弦相似度的取值范围固定在 0~2，能带来更稳定的训练效果。优化得到的权重$\lambda^t$，最终用于全局模型的聚合：$\theta</em>{g}^{t+1}&#x3D;\sum_{k&#x3D;1}^{K} \lambda_{k}^{t} \theta_{k}^{t}$。</p>
+<h4 id="4-3-3-分层优化版本-FedAWA-L"><a href="#4-3-3-分层优化版本-FedAWA-L" class="headerlink" title="4.3.3 分层优化版本 FedAWA-L"></a>4.3.3 分层优化版本 FedAWA-L</h4><p>针对深度神经网络不同层的参数更新存在显著差异的特性，本文为模型的每一层设计了独立的聚合权重，提出细粒度优化的 FedAWA-L，目标函数如下：<br>$\lambda_{l}^{t}&#x3D;\underset{\lambda}{arg min }\left(\sum_{k&#x3D;1}^{K} \lambda_{k l}\left| \tau_{k l}^{t}-\tau_{g l}^{t}\right| <em>{2}+d\left(\sum</em>{k&#x3D;1}^{K} \lambda_{k l} \theta_{k l}^{t}, \theta_{g l}^{t}\right)\right), s.t. | \lambda| _{1}&#x3D;1$<br>其中：</p>
+<ul>
+<li><p>$\lambda_{kl}$：第 k 个客户端第 l 层的聚合权重；</p>
+</li>
+<li><p>$\tau_{kl}^t$、$\theta_{kl}^t$：分别为客户端 k 的客户端向量、本地模型参数的第 l 层；</p>
+</li>
+<li><p>$\tau_{gl}^t$、$\theta_{gl}^t$：分别为全局向量、全局模型参数的第 l 层。</p>
+</li>
+</ul>
+<h4 id="4-3-4-FedAWA-完整算法流程"><a href="#4-3-4-FedAWA-完整算法流程" class="headerlink" title="4.3.4 FedAWA 完整算法流程"></a>4.3.4 FedAWA 完整算法流程</h4><figure class="highlight plaintext"><figcaption><span>Text</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">算法1 FedAWA：基于自适应权重聚合的联邦学习算法</span><br><span class="line">输入：通信轮数T，本地训练轮数E，客户端本地数据集&#123;D1, ..., DK&#125;，初始全局模型θ_g^1，初始聚合权重λ^0（λ^0_k = |Dk|/Σ|Di|，与FedAvg一致）</span><br><span class="line">输出：最终训练完成的全局模型θ_g^T</span><br><span class="line"></span><br><span class="line">1.  for t = 1 to T do</span><br><span class="line">2.      服务器向所有客户端广播当前全局模型θ_g^t</span><br><span class="line">3.      // 客户端本地训练执行</span><br><span class="line">4.      for each client k ∈ [K] do</span><br><span class="line">5.          θ_k^t ← ClientUpdate(θ_g^t, Dk, E)  // 本地E轮训练更新模型</span><br><span class="line">6.          将本地模型θ_k^t上传至服务器</span><br><span class="line">7.      end for</span><br><span class="line">8.      // 服务器端权重优化与聚合执行</span><br><span class="line">9.      服务器通过公式计算所有客户端的τ_k^t，以及全局向量τ_g^t</span><br><span class="line">10.     若启用FedAWA：服务器通过最终目标函数优化得到本轮聚合权重λ^t</span><br><span class="line">11.     若启用FedAWA-L：服务器通过分层目标函数优化得到本轮分层聚合权重λ_l^t</span><br><span class="line">12.     服务器聚合本地模型生成新一轮全局模型：</span><br><span class="line">13.        若启用FedAWA：θ_g^&#123;t+1&#125; = Σ_&#123;k=1&#125;^K λ_k^t θ_k^t</span><br><span class="line">14.        若启用FedAWA-L：θ_g^&#123;t+1&#125; = Σ_&#123;k=1&#125;^K Σ_&#123;l=1&#125;^L λ_&#123;kl&#125;^t θ_&#123;kl&#125;^t</span><br><span class="line">15. end for</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-方法的核心特性"><a href="#4-4-方法的核心特性" class="headerlink" title="4.4 方法的核心特性"></a>4.4 方法的核心特性</h3><ol>
+<li><p><strong>隐私安全性</strong>：FedAWA 的所有权重优化计算，仅依赖联邦学习原生流程中服务器已获取的模型参数，无需客户端上传原始数据、无需额外代理数据集，无数据泄露风险，完全符合联邦学习的隐私保护要求。</p>
+</li>
+<li><p><strong>模块化兼容性</strong>：FedAWA 可作为即插即用的模块，与现有联邦学习方法无缝集成。对于客户端侧优化的方法（如 FedProx、FedDyn），FedAWA 在服务端独立运行，无逻辑冲突；对于服务端固定权重的方法（如 FedAvg、FedDisco），可将其输出的权重作为 FedAWA 优化的初始值，进一步提升模型性能。</p>
+</li>
+</ol>
+<h2 id="五、实验验证"><a href="#五、实验验证" class="headerlink" title="五、实验验证"></a>五、实验验证</h2><h3 id="5-1-实验设置"><a href="#5-1-实验设置" class="headerlink" title="5.1 实验设置"></a>5.1 实验设置</h3><ul>
+<li><p><strong>数据集</strong>：CIFAR-10、CIFAR-100、Tiny-ImageNet 三大图像分类数据集；</p>
+</li>
+<li><p><strong>模型架构</strong>：主实验采用 ResNet20（CIFAR 数据集）、ResNet18（Tiny-ImageNet），拓展实验覆盖 CNN、Wide-ResNet、DenseNet、ViT 等主流架构；</p>
+</li>
+<li><p><strong>数据异构模拟</strong>：采用 Dirichlet 分布$Dir_\alpha$划分数据，α 越小异构程度越高，测试了 α&#x3D;0.1（强异构）、α&#x3D;0.5（中异构）、α&#x3D;100（IID）三种核心场景；</p>
+</li>
+<li><p><strong>对比基线</strong>：7 种主流联邦学习方法，包括 FedAvg、FedProx、FedDyn（客户端侧优化），FedAdam、FedDisco、FedLAW、L-DAWA（服务端优化）；</p>
+</li>
+<li><p><strong>评价指标</strong>：Top-1 测试准确率、单轮聚合执行时间。</p>
+</li>
+</ul>
+<h3 id="5-2-核心实验结果"><a href="#5-2-核心实验结果" class="headerlink" title="5.2 核心实验结果"></a>5.2 核心实验结果</h3><ol>
+<li><p><strong>综合性能表现</strong>：FedAWA 与 FedAWA-L 在所有数据集、所有异构程度下均取得了最优的平均 Top-1 准确率，平均准确率分别达 49.48%、49.98%，超越所有基线方法；在强异构（α&#x3D;0.1）场景下提升尤为显著，例如 CIFAR-10 数据集上，FedAWA 准确率 63.55%，远超 FedAvg 的 61.04% 与 L-DAWA 的 62.87%。</p>
+</li>
+<li><p><strong>场景鲁棒性</strong>：在不同客户端数量（10&#x2F;30&#x2F;50）、本地训练轮数（1&#x2F;5&#x2F;10）、客户端参与率（0.1&#x2F;0.3&#x2F;0.5）的设置下，FedAWA 均能稳定为基线方法带来性能提升，适配多样化的联邦学习落地场景。</p>
+</li>
+<li><p><strong>模块化兼容性</strong>：将 FedAWA 与 FedAvg、FedProx、FedDisco 集成后，所有基线方法在不同异构程度下的性能均得到一致提升，验证了其即插即用的特性。</p>
+</li>
+<li><p><strong>计算效率</strong>：FedAWA 单轮聚合执行时间仅 0.82 秒，远低于 L-DAWA 的 2.52 秒、FedLAW 的 10.11 秒，仅比基础 FedAvg（0.10 秒）略有增加，在性能与计算开销间实现了优秀的平衡；FedAWA-L 性能最优，但计算开销更高（15.21 秒），更适合对精度要求高的场景。</p>
+</li>
+<li><p><strong>架构泛用性</strong>：在 CNN、ResNet、Wide-ResNet、DenseNet、ViT 等不同网络架构上，FedAWA 均能稳定超越基线方法，无架构依赖，具备极强的泛用性。</p>
+</li>
+</ol>
+<h3 id="5-3-关键消融实验"><a href="#5-3-关键消融实验" class="headerlink" title="5.3 关键消融实验"></a>5.3 关键消融实验</h3><ol>
+<li><p><strong>优化过程的有效性</strong>：对比直接用余弦相似度作为权重的 FedAWA-COS，FedAWA 通过迭代优化权重取得了更高的准确率，证明了权重优化过程的核心价值；同时 FedAWA-COS 性能超越 L-DAWA，验证了客户端向量比原始模型参数更能有效捕捉本地数据信息。</p>
+</li>
+<li><p><strong>权重优化的合理性</strong>：FedAWA 优化得到的聚合权重，与理想数据集向量（本地数据与全局数据的相似度）的相似度在训练中持续提升并收敛，且远高于其他对比方法，证明其权重优化方向完全符合预期。</p>
+</li>
+<li><p><strong>正则项的作用</strong>：移除正则项后模型性能出现明显下降，采用 1 - 余弦相似度作为正则项的效果略优于欧氏距离，验证了正则项对训练稳定性的提升作用，以及余弦距离的优越性。</p>
+</li>
+</ol>
+<h2 id="六、结论与未来工作"><a href="#六、结论与未来工作" class="headerlink" title="六、结论与未来工作"></a>六、结论与未来工作</h2><h3 id="6-1-核心结论"><a href="#6-1-核心结论" class="headerlink" title="6.1 核心结论"></a>6.1 核心结论</h3><ol>
+<li><p>本文通过系统性实验验证，联邦学习中的客户端向量能够有效捕捉本地数据集的分布特征，且聚合后的全局向量与模型理想更新方向高度一致，为联邦学习聚合权重的优化提供了可靠的理论与实验依据。</p>
+</li>
+<li><p>提出的 FedAWA 方法，无需额外代理数据集，在保障隐私安全的前提下，实现了聚合权重的自适应动态优化，有效缓解了数据异构带来的联邦学习收敛不稳定、全局模型性能下降的核心痛点。</p>
+</li>
+<li><p>大规模实验证明，FedAWA 在不同数据集、异构程度、模型架构、训练超参数的场景下均能取得优异性能，同时具备优秀的模块化兼容性，可与现有联邦学习方法集成进一步提升效果，具备极高的落地价值。</p>
+</li>
+</ol>
+<h3 id="6-2-局限性与未来工作"><a href="#6-2-局限性与未来工作" class="headerlink" title="6.2 局限性与未来工作"></a>6.2 局限性与未来工作</h3><ol>
+<li><p><strong>方法局限性</strong>：当前 FedAWA 仅适用于所有客户端模型架构完全一致的联邦学习场景，无法处理客户端模型异构的场景，这也是现有多数联邦学习方法的共同挑战。</p>
+</li>
+<li><p><strong>未来工作方向</strong>：将 FedAWA 方法扩展到客户端模型架构异构的联邦学习场景中，进一步提升方法的适用范围，适配更复杂的真实落地场景。</p>
+</li>
+</ol>
+<h2 id="七、关键亮点与思考"><a href="#七、关键亮点与思考" class="headerlink" title="七、关键亮点与思考"></a>七、关键亮点与思考</h2><h3 id="7-1-方法核心亮点"><a href="#7-1-方法核心亮点" class="headerlink" title="7.1 方法核心亮点"></a>7.1 方法核心亮点</h3><ol>
+<li><p><strong>跨领域的创新融合</strong>：首次将模型合并领域的 Task Arithmetic 思想与联邦学习的聚合过程深度结合，跳出了传统基于数据量、分布差异的权重设计思路，为联邦学习聚合权重优化提供了全新的、可解释的技术路径。</p>
+</li>
+<li><p><strong>隐私与性能的双赢</strong>：完全摒弃了现有自适应权重方法对代理数据集的依赖，所有计算仅利用联邦学习原生流程中的信息，无额外隐私风险，同时实现了模型性能的显著提升，完美契合联邦学习的核心隐私诉求。</p>
+</li>
+<li><p><strong>极强的工程落地性</strong>：算法逻辑简洁，计算开销低，同时具备即插即用的模块化特性，可无缝集成到现有的联邦学习系统中，无需修改客户端侧的训练逻辑，落地门槛极低。</p>
+</li>
+<li><p><strong>灵活的细粒度扩展能力</strong>：提出的分层版本 FedAWA-L，针对神经网络不同层的更新特性设计独立权重，实现了更精细的聚合优化，为后续分层联邦学习、个性化联邦学习的研究提供了新的思路。</p>
+</li>
+</ol>
+<h3 id="7-2-研究启发与思考"><a href="#7-2-研究启发与思考" class="headerlink" title="7.2 研究启发与思考"></a>7.2 研究启发与思考</h3><ol>
+<li><p>对于联邦学习的聚合权重优化，相比人工设计固定的权重公式，基于训练过程中模型更新的动态信息进行迭代优化，更能适配异构数据下的动态训练过程，是未来更具潜力的研究方向。</p>
+</li>
+<li><p>客户端向量能精准刻画本地数据的异构特征，除了聚合权重优化，还可拓展到客户端选择、个性化联邦学习、恶意客户端检测等多个联邦学习研究方向，具备极高的复用价值。</p>
+</li>
+<li><p>模型合并领域的诸多成熟技术，与联邦学习的聚合过程存在天然的契合性，后续可进一步探索两者的深度融合，为解决联邦学习的数据异构痛点提供更多创新方案。</p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io">Fash0o0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io/2025/12/11/%E3%80%90CVPR-2025-%E5%90%89%E6%9E%97%E5%A4%A7%E5%AD%A6%E3%80%91FedAWA%EF%BC%9AAdaptive-Optimization-of-Aggregation-Weights-in-Federated-Learning-Using-Client-Vectors/">https://fash0o0.github.io/2025/12/11/【CVPR-2025-吉林大学】FedAWA：Adaptive-Optimization-of-Aggregation-Weights-in-Federated-Learning-Using-Client-Vectors/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://fash0o0.github.io" target="_blank">Fash的回忆簿</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0/">联邦学习</a><a class="post-meta__tags" href="/tags/Non-IID/">Non-IID</a><a class="post-meta__tags" href="/tags/%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4/">隐私保护</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">论文笔记</a><a class="post-meta__tags" href="/tags/%E8%81%9A%E5%90%88%E6%9D%83%E9%87%8D%E4%BC%98%E5%8C%96/">聚合权重优化</a></div><div class="post-share"><div class="social-share" data-image="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/01/19/%E3%80%90NeurIPS-2025-%E4%BD%9B%E7%BD%97%E9%87%8C%E8%BE%BE%E5%A4%A7%E5%AD%A6%E3%80%91Adaptive%20LoRA%20Experts%20Allocation%20and%20Selection%20for%20Federated%20Fine-Tuning/" title="【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息标题：Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning（https://arxiv.org/abs/2509.15087v2） 作者及单位：Lei Wang (University of Florida), Jieming Bian (University of Florida), Letian Zhang (Middle Tennessee State University), Jie Xu (University of Florida) 发表时间：2025年（NeurIPS 2025） 代码开源地址：lei-wang-link&#x2F;FedLEASE 核心定位：针对联邦学习中语言模型微调的异构客户端问题，提出FedLEASE框架，通过自适应专家分配和选择机制，实现高效、隐私保护的联邦微调。 二、研究背景与核心问题大型语言模型(LLMs)在各种任务中表现出色，但针对特定领域应用的微调通常需要大量领域特定数据，这些数据可能分布在多个组织中。联邦学习(FL)提供了一种...</div></div></div></a><a class="pagination-related" href="/2025/12/11/%E3%80%90AAAI-2022-%E6%82%89%E5%B0%BC%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6%E3%80%91FedProto%EF%BC%9AFederated-Prototype-Learning-across-Heterogeneous-Clients/" title="【AAAI-2022-悉尼科技大学】FedProto：Federated Prototype Learning across Heterogeneous Clients"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">【AAAI-2022-悉尼科技大学】FedProto：Federated Prototype Learning across Heterogeneous Clients</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FedProto: Federated Prototype Learning across Heterogeneous Clients 作者及单位：Yue Tan¹, Guodong Long¹, Lu Liu¹, Tianyi Zhou²³, Qinghua Lu⁴, Jing Jiang¹, Chengqi Zhang¹ ¹澳大利亚人工智能研究所，悉尼科技大学 ²华盛顿大学 ³马里兰大学帕克分校 ⁴Data61, CSIRO   发表时间：2022年（AAAI Conference on Artificial Intelligence） 代码开源地址：暂未开源 核心定位：针对联邦学习中客户端在数据分布、模型架构、输入输出空间等方面的异构性挑战，提出基于类别原型交换的新型联邦学习框架，通过聚合抽象特征表示而非模型参数实现知识共享，显著提升通信效率、增强隐私保护并改善异构环境下的模型收敛性与泛化性能。  二、研究背景与核心问题联邦学习（FL）旨在通过中央服务器协调多个客户端协同训练模型，同时保护本地数据隐私。然而，现实场景中客户端普遍存在 统计异构性（数据...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/12/11/%E3%80%90AAAI-2022-%E6%82%89%E5%B0%BC%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6%E3%80%91FedProto%EF%BC%9AFederated-Prototype-Learning-across-Heterogeneous-Clients/" title="【AAAI-2022-悉尼科技大学】FedProto：Federated Prototype Learning across Heterogeneous Clients"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-11</div><div class="info-item-2">【AAAI-2022-悉尼科技大学】FedProto：Federated Prototype Learning across Heterogeneous Clients</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FedProto: Federated Prototype Learning across Heterogeneous Clients 作者及单位：Yue Tan¹, Guodong Long¹, Lu Liu¹, Tianyi Zhou²³, Qinghua Lu⁴, Jing Jiang¹, Chengqi Zhang¹ ¹澳大利亚人工智能研究所，悉尼科技大学 ²华盛顿大学 ³马里兰大学帕克分校 ⁴Data61, CSIRO   发表时间：2022年（AAAI Conference on Artificial Intelligence） 代码开源地址：暂未开源 核心定位：针对联邦学习中客户端在数据分布、模型架构、输入输出空间等方面的异构性挑战，提出基于类别原型交换的新型联邦学习框架，通过聚合抽象特征表示而非模型参数实现知识共享，显著提升通信效率、增强隐私保护并改善异构环境下的模型收敛性与泛化性能。  二、研究背景与核心问题联邦学习（FL）旨在通过中央服务器协调多个客户端协同训练模型，同时保护本地数据隐私。然而，现实场景中客户端普遍存在 统计异构性（数据...</div></div></div></a><a class="pagination-related" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-19</div><div class="info-item-2">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FedFMSL: Federated Learning of Foundation Models With Sparsely Activated LoRA  论文链接：https://ieeexplore.ieee.org/document/10648634/ (DOI: 10.1109&#x2F;TMC.2024.3454634)  作者及单位：  Panlong Wu, Kangshuo Li, Ting Wang：香港中文大学（深圳）理工学院、深圳智能未来网络研究院  Yanjie Dong, Victor C. M. Leung：深圳北理莫斯科大学人工智能研究院、粤港澳大湾区情感智能与普适计算联合实验室  Fangxin Wang（通讯作者）：香港中文大学（深圳）理工学院、深圳智能未来网络研究院、广东省智能未来网络重点实验室    发表时间：2024 年 9 月在线发表，2024 年 12 月正式刊出于《IEEE TRANSACTIONS ON MOBILE COMPUTING》（VOL. 23, NO. 12）  代码开源地址：暂未开源  核心定...</div></div></div></a><a class="pagination-related" href="/2025/12/05/%E3%80%90arXiv-2024-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91FeDeRA%EF%BC%9AEfficient%20Fine-tuning%20of%20Language%20Models%20in%20Federated/" title="【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-05</div><div class="info-item-2">【arXiv-2024-浙江大学】FeDeRA：Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition</div></div><div class="info-2"><div class="info-item-1">前置笔记：矩阵奇异值分解（SVD） 一、论文基本信息 标题：FeDeRA: Efficient Fine-tuning of Language Models in Federated Learning Leveraging Weight Decomposition 作者及单位：Yuxuan Yan, Shunpu Tang, Zhiguo Shi, Qianqian Yang（浙江大学信息与电子工程学院） 发表时间：2024年5月（arXiv预印本） 代码开源地址：[暂未开源] 核心定位：针对联邦学习微调PLMs面临non-IID数据导致PEFT性能严重下降的问题，提出通过SVD提取预训练权重的主成分来初始化低秩适配器。  二、研究背景与核心问题研究背景：  预训练语言模型（PLMs）的隐私挑战：PLMs在各类NLP任务上表现出卓越性能，但集中式微调需要聚合所有数据，引发严重的数据隐私担忧。联邦学习（FL）作为分布式协作训练范式，可在不共享原始数据的情况下联合训练模型，成为解决隐私问题的有效方案。 资源约束瓶颈：PLMs参数规模达数十亿甚至百亿级，在FL场景下频繁交换完整模型参数...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Fash0o0</div><div class="author-info-description">在码头等火车</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Fash0o0"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">享受活着的每一天</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AE%BA%E6%96%87%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">一、论文基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF%E4%B8%8E%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">二、研究背景与核心问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A0%B8%E5%BF%83%E8%B4%A1%E7%8C%AE"><span class="toc-number">3.</span> <span class="toc-text">三、核心贡献</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">四、核心方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%89%8D%E7%BD%AE%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 前置基础概念</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-1-%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E6%B5%81%E7%A8%8B"><span class="toc-number">4.1.1.</span> <span class="toc-text">4.1.1 联邦学习基础流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-2-Task-Arithmetic-%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-number">4.1.2.</span> <span class="toc-text">4.1.2 Task Arithmetic 核心思想</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E6%A0%B8%E5%BF%83%E7%BB%8F%E9%AA%8C%E8%A7%82%E5%AF%9F%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 核心经验观察与动机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-FedAWA-%E6%A0%B8%E5%BF%83%E7%AE%97%E6%B3%95%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.3.</span> <span class="toc-text">4.3 FedAWA 核心算法设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-1-%E5%9F%BA%E7%A1%80%E4%BC%98%E5%8C%96%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0"><span class="toc-number">4.3.1.</span> <span class="toc-text">4.3.1 基础优化目标函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-2-%E5%B8%A6%E5%85%A8%E5%B1%80%E5%AF%B9%E9%BD%90%E6%AD%A3%E5%88%99%E9%A1%B9%E7%9A%84%E6%9C%80%E7%BB%88%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0"><span class="toc-number">4.3.2.</span> <span class="toc-text">4.3.2 带全局对齐正则项的最终目标函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-3-%E5%88%86%E5%B1%82%E4%BC%98%E5%8C%96%E7%89%88%E6%9C%AC-FedAWA-L"><span class="toc-number">4.3.3.</span> <span class="toc-text">4.3.3 分层优化版本 FedAWA-L</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-4-FedAWA-%E5%AE%8C%E6%95%B4%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="toc-number">4.3.4.</span> <span class="toc-text">4.3.4 FedAWA 完整算法流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E6%96%B9%E6%B3%95%E7%9A%84%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"><span class="toc-number">4.4.</span> <span class="toc-text">4.4 方法的核心特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%AE%9E%E9%AA%8C%E9%AA%8C%E8%AF%81"><span class="toc-number">5.</span> <span class="toc-text">五、实验验证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 实验设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E6%A0%B8%E5%BF%83%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 核心实验结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%85%B3%E9%94%AE%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 关键消融实验</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%BB%93%E8%AE%BA%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.</span> <span class="toc-text">六、结论与未来工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E6%A0%B8%E5%BF%83%E7%BB%93%E8%AE%BA"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 核心结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%B1%80%E9%99%90%E6%80%A7%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 局限性与未来工作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%85%B3%E9%94%AE%E4%BA%AE%E7%82%B9%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">7.</span> <span class="toc-text">七、关键亮点与思考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E6%96%B9%E6%B3%95%E6%A0%B8%E5%BF%83%E4%BA%AE%E7%82%B9"><span class="toc-number">7.1.</span> <span class="toc-text">7.1 方法核心亮点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E7%A0%94%E7%A9%B6%E5%90%AF%E5%8F%91%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">7.2.</span> <span class="toc-text">7.2 研究启发与思考</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/10/%E3%80%90arXiv-2025-%E5%A4%A9%E6%B4%A5%E5%A4%A7%E5%AD%A6%E3%80%91ILoRA%EF%BC%9AFederated%20Learning%20with%20Low-Rank%20Adaptation%20for%20Heterogeneous%20Client%20Aggregation/" title="【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation">【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation</a><time datetime="2026-04-10T01:31:23.000Z" title="发表于 2026-04-10 09:31:23">2026-04-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/" title="【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</a><time datetime="2026-04-03T01:31:23.000Z" title="发表于 2026-04-03 09:31:23">2026-04-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90TMLR-2026-%E6%BE%B3%E9%97%A8%E5%A4%A7%E5%AD%A6%E3%80%91A%20Survey%20on%20Federated%20Fine-Tuning%20of%20Large%20Language%20Models/" title="【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models">【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models</a><time datetime="2026-03-20T15:45:34.000Z" title="发表于 2026-03-20 23:45:34">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/" title="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</a><time datetime="2026-03-20T03:31:23.000Z" title="发表于 2026-03-20 11:31:23">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</a><time datetime="2026-03-19T15:45:34.000Z" title="发表于 2026-03-19 23:45:34">2026-03-19</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2026 By Fash0o0</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="/"></script></div></body></html>

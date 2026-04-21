@@ -1,0 +1,411 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts | Fash的回忆簿</title><meta name="author" content="Fash0o0"><meta name="copyright" content="Fash0o0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、论文基本信息 标题：FlyLoRA: Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts（arXiv:2510.08396v2）  作者及单位：  Heming Zou, Wutong Xu, Yao Zhu, Xiangyang Ji（清华大学自动化系）  Yu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts">
+<meta property="og:url" content="https://fash0o0.github.io/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/index.html">
+<meta property="og:site_name" content="Fash的回忆簿">
+<meta property="og:description" content="一、论文基本信息 标题：FlyLoRA: Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts（arXiv:2510.08396v2）  作者及单位：  Heming Zou, Wutong Xu, Yao Zhu, Xiangyang Ji（清华大学自动化系）  Yu">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp">
+<meta property="article:published_time" content="2026-03-20T03:31:23.000Z">
+<meta property="article:modified_time" content="2026-04-21T08:56:39.976Z">
+<meta property="article:author" content="Fash0o0">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="LoRA">
+<meta property="article:tag" content="MoE">
+<meta property="article:tag" content="PEFT">
+<meta property="article:tag" content="论文笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts",
+  "url": "https://fash0o0.github.io/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/",
+  "image": "https://fash0o0.github.io/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp",
+  "datePublished": "2026-03-20T03:31:23.000Z",
+  "dateModified": "2026-04-21T08:56:39.976Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Fash0o0",
+      "url": "https://fash0o0.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://fash0o0.github.io/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E5%9B%BE.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Fash的回忆簿</span></a><a class="nav-page-title" href="/"><span class="site-name">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-20T03:31:23.000Z" title="发表于 2026-03-20 11:31:23">2026-03-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-21T08:56:39.976Z" title="更新于 2026-04-21 16:56:39">2026-04-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="一、论文基本信息"><a href="#一、论文基本信息" class="headerlink" title="一、论文基本信息"></a>一、论文基本信息</h2><ul>
+<li><p><strong>标题</strong>：FlyLoRA: Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts（arXiv:2510.08396v2）</p>
+</li>
+<li><p><strong>作者及单位</strong>：</p>
+<ul>
+<li><p>Heming Zou, Wutong Xu, Yao Zhu, Xiangyang Ji（清华大学自动化系）</p>
+</li>
+<li><p>Yunliang Zang（天津大学医学工程与转化医学研究院）</p>
+</li>
+</ul>
+</li>
+<li><p><strong>发表时间</strong>：2025 年 10 月（NeurIPS 2025）</p>
+</li>
+<li><p><strong>代码开源地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/gfyddha/FlyLoRA">https://github.com&#x2F;gfyddha&#x2F;FlyLoRA</a></p>
+</li>
+<li><p><strong>核心定位</strong>：针对低秩适配（LoRA）存在的任务内 &#x2F; 任务间参数干扰、现有 MoE-based LoRA 路由参数开销大的核心痛点，受果蝇嗅觉神经回路启发，提出隐式秩级专家混合的 FlyLoRA 框架，同时实现高效的单任务内解耦与多任务间解耦，在更低的参数与计算开销下，全面提升大模型微调与多任务合并的性能。</p>
+</li>
+</ul>
+<h2 id="二、研究背景与核心问题"><a href="#二、研究背景与核心问题" class="headerlink" title="二、研究背景与核心问题"></a>二、研究背景与核心问题</h2><ol>
+<li><p><strong>大模型微调的效率刚需</strong>：大模型全参数微调计算与存储成本极高，以 LoRA 为代表的参数高效微调（PEFT）方法成为主流，通过冻结预训练权重、仅微调少量低秩矩阵，在保留性能的同时大幅降低资源开销。</p>
+</li>
+<li><p><strong>LoRA 的核心缺陷：参数干扰</strong></p>
+<ul>
+<li><p><strong>任务内干扰</strong>：LoRA 的秩间参数存在相互干扰，复杂任务下需提升秩才能保证性能，与 PEFT 的效率核心目标矛盾，还会引发幻觉、梯度爆炸等训练不稳定问题。</p>
+</li>
+<li><p><strong>任务间干扰</strong>：多任务场景下，无训练合并不同任务的 LoRA 组件时，不同任务的参数更新会产生冲突，导致模型性能大幅衰减。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>现有 MoE-based LoRA 的瓶颈</strong>：基于专家混合（MoE）的 LoRA 变体虽能缓解部分任务内干扰，但引入了额外的可训练路由矩阵，专家粒度越细，路由参数开销越大，陷入 “性能 - 效率” 的两难权衡；同时现有方法几乎未解决多任务合并中的任务间干扰问题。</p>
+</li>
+</ol>
+<h2 id="三、核心贡献"><a href="#三、核心贡献" class="headerlink" title="三、核心贡献"></a>三、核心贡献</h2><ol>
+<li><p><strong>高效的单任务内解耦设计</strong>：提出隐式秩级 MoE 结构，将每个秩作为独立专家实现最细粒度的参数分配，同时通过冻结稀疏随机投影替代可训练路由，完全消除了显式路由参数开销，在单任务微调中大幅降低秩间参数干扰，参数效率与性能均超越传统 MoE-based LoRA。</p>
+</li>
+<li><p><strong>原生的多任务间解耦能力</strong>：从理论上证明了独立稀疏随机投影的近似子空间正交性，让不同任务的 FlyLoRA 参数更新天然处于近乎正交的子空间，无需额外训练或复杂算法，即可在无训练多任务模型合并中显著缓解任务间参数干扰，大幅降低合并后的性能衰减。</p>
+</li>
+<li><p><strong>神经科学启发的 AI 创新</strong>：完整借鉴果蝇嗅觉回路的随机稀疏投影 + 赢者通吃的神经机制，解决了 MoE-LoRA 的核心瓶颈，搭建了神经科学与人工智能交叉创新的有效桥梁。</p>
+</li>
+<li><p><strong>完备的理论与实验验证</strong>：通过三大核心定理严格证明了方法的距离保持性、梯度解耦特性与子空间正交性；在通用知识、科学问答、数学推理、代码生成四大核心领域，基于 Llama-3.1、Qwen-2.5 系列主流大模型完成了全面的实验验证，证明了方法的通用性与有效性。</p>
+</li>
+</ol>
+<h2 id="四、核心方法"><a href="#四、核心方法" class="headerlink" title="四、核心方法"></a>四、核心方法</h2><h3 id="4-1-基础方法回顾"><a href="#4-1-基础方法回顾" class="headerlink" title="4.1 基础方法回顾"></a>4.1 基础方法回顾</h3><ol>
+<li><p><strong>标准 LoRA</strong><br>对于预训练权重矩阵$W_0 \in \mathbb{R}^{m×n}$，LoRA 将权重更新$\Delta W$分解为两个低秩矩阵的乘积$\Delta W&#x3D;BA$，其中$B \in \mathbb{R}^{m×r}$、$A \in \mathbb{R}^{r×n}$，且秩$r \ll min(m,n)$。前向传播公式为：<br>$f_{LoRA}(x)&#x3D;W_0 x+\frac{\alpha}{r} B A x$<br>训练过程中$W_0$全程冻结，仅$A$和$B$可训练，参数量从$O(mn)$降至$O(r(m+n))$。</p>
+</li>
+<li><p><strong>MoE-based LoRA</strong><br>将低秩适配分解为$N$个独立专家，每个专家对应一组低秩矩阵${B_i,A_i}$，通过可训练的路由函数$G(x)$动态激活 top-k 个相关专家，前向传播公式为：<br>$f_{MoE-LoRA}(x)&#x3D;W_0 x+\frac{\alpha}{r} \sum_{i&#x3D;1}^{N} G(x)_i \cdot B_i A_i x$<br>路由函数通常为$G(x)&#x3D;top-k(W_g x)$，其中$W_g \in \mathbb{R}^{N×n}$为可训练路由矩阵。该方法的核心缺陷是：路由参数随专家数量线性增长，细粒度专家会导致路由开销剧增，且无法解决多任务合并的干扰问题。</p>
+</li>
+<li><p><strong>极致化的秩级专家设计</strong><br>将 MoE 分解推向极致，把 LoRA 的每个秩作为一个独立专家（rank-wise expert），每个专家对应$A$的一行与$B$的一列，实现最细粒度的解耦。但该设计会让路由参数规模达到峰值，因此必须设计无显式参数的隐式路由机制。</p>
+</li>
+</ol>
+<h3 id="4-2-方法灵感来源：果蝇嗅觉回路"><a href="#4-2-方法灵感来源：果蝇嗅觉回路" class="headerlink" title="4.2 方法灵感来源：果蝇嗅觉回路"></a>4.2 方法灵感来源：果蝇嗅觉回路</h3><p>FlyLoRA 的核心设计完全借鉴果蝇嗅觉神经回路的信息处理机制：</p>
+<ol>
+<li><p>气味信号从投射神经元（PNs）随机稀疏投射到肯扬细胞（KCs），形成高维稀疏表征；</p>
+</li>
+<li><p>通过前配对侧神经元（APL）的侧抑制，实现 “赢者通吃” 的稀疏激活，仅保留响应最强的肯扬细胞；</p>
+</li>
+<li><p>最终选择性投射到蘑菇体输出神经元（MBONs），实现气味信号的解耦、可分表征。</p>
+</li>
+</ol>
+<p>基于此，FlyLoRA 设计了 \<em>\</em> 固定稀疏随机投影（对应 PNs→KCs 的随机投射）+ top-k 赢者通吃激活（对应 APL 的侧抑制机制）\<em>\</em> 的核心结构。</p>
+<h3 id="4-3-FlyLoRA-的形式化定义"><a href="#4-3-FlyLoRA-的形式化定义" class="headerlink" title="4.3 FlyLoRA 的形式化定义"></a>4.3 FlyLoRA 的形式化定义</h3><ol>
+<li><p><strong>核心矩阵设计</strong></p>
+<ul>
+<li><p>下投影矩阵$A \in \mathbb{R}^{r×n}$：稀疏、随机初始化后全程冻结，每行仅有$p(p&lt;n)$个非零项，独立采样自$N(0, \frac{1}{r^2})$，稀疏率$\rho&#x3D;\frac{p}{n}$。</p>
+</li>
+<li><p>上投影矩阵$B \in \mathbb{R}^{m×r}$：唯一可训练的参数矩阵，每一列对应一个秩级专家。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>隐式路由与前向传播</strong><br>输入嵌入$x \in \mathbb{R}^n$先经过冻结矩阵$A$投影，再通过 top-k 操作筛选出幅值最大的$k$个维度，仅激活$B$中对应维度的列，未选中的列输出置 0，完整前向传播流程为：</p>
+<ol>
+<li><p>投影与专家选择：$y&#x3D;Ax+d$（$d$为负载均衡偏置项），筛选 top-k 幅值对应的索引集$\mathcal{I}_{topk}$</p>
+</li>
+<li><p>稀疏激活与输出：<br> $f_{FlyLoRA}(x) &#x3D; W_0 x + \frac{\alpha}{r} \sum_{i&#x3D;1}^{r} \mathbb{I}(i \in \mathcal{I}_{topk}) \cdot b_i a_i x$<br> 其中$\mathbb{I}(\cdot)$为指示函数，$a_i$为$A$的第$i$行，$b_i$为$B$的第$i$列。</p>
+</li>
+</ol>
+</li>
+<li><p><strong>无损失负载均衡设计</strong><br>为缓解 MoE 结构常见的专家激活不均衡问题，引入专家级偏置项$d \in \mathbb{R}^r$，通过无损失的手动更新方式实现负载均衡：<br>$d_i \leftarrow d_i + u \cdot sign(\bar{c}_i - c_i)$<br>其中$u$为小学习率，$\bar{c}_i$为专家$i$的期望激活频率，$c_i$为实际激活次数。该偏置项会加入$Ax$中再进行 top-k 选择，促进低激活专家的使用，抑制过激活专家，提升训练稳定性。</p>
+</li>
+</ol>
+<h3 id="4-4-三大核心理论支撑"><a href="#4-4-三大核心理论支撑" class="headerlink" title="4.4 三大核心理论支撑"></a>4.4 三大核心理论支撑</h3><ol>
+<li><p><strong>稀疏随机投影的距离保持性（隐式路由有效性）</strong><br>定理 3.1 证明，FlyLoRA 的稀疏随机投影矩阵$A$能以高概率近似保持输入向量间的欧氏距离，满足扩展的 Johnson-Lindenstrauss 引理。</p>
+<ul>
+<li><p>语义相似的输入会被映射到相近的表征，路由到相似的专家；语义差异大的输入会被路由到不同专家，避免专家表征同质化，让每个专家专注于特定领域知识。</p>
+</li>
+<li><p>该特性证明了固定矩阵$A$可完全替代可训练路由，实现了下投影与专家路由的功能统一，彻底消除了显式路由参数开销与路由优化带来的训练不稳定性。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>Top-k 稀疏性的梯度解耦特性（任务内干扰缓解）</strong><br>定理 3.3 证明，top-k 稀疏激活会让不同秩级专家之间的梯度协方差以$O(\frac{k^2}{r^2})$的系数大幅降低。</p>
+<ul>
+<li><p>当$k&#x3D;1$时，仅激活 1 个秩，非对角梯度协方差几乎消失，实现完全的参数解耦；</p>
+</li>
+<li><p>当$k&#x3D;r$时，所有秩全激活，方法退化为 LoRA-FA。<br> 该定理从理论上解释了 FlyLoRA 为何能消除秩间参数干扰，实验可视化也验证了 FlyLoRA 的梯度相关性远低于传统 LoRA。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>随机投影的近似子空间正交性（任务间干扰缓解）</strong><br>定理 3.4 与推论 3.5 证明，独立初始化的稀疏随机矩阵$A_i$和$A_j$具备两大核心特性：</p>
+<ul>
+<li><p>精确的期望正交性：$\mathbb{E}[A_i A_j^\top] &#x3D; 0_{r×r}$；</p>
+</li>
+<li><p>多项式衰减的残差相关性：相关性随输入维度$n$、总秩$r$的增大快速趋近于 0。<br> 由此可推导出，不同任务的 FlyLoRA 更新矩阵$B_i A_i$与$B_j A_j$的 Frobenius 内积近似为 0，即不同任务的参数更新天然处于近乎正交的子空间，从结构上避免了多任务合并时的参数冲突。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="五、实验验证"><a href="#五、实验验证" class="headerlink" title="五、实验验证"></a>五、实验验证</h2><h3 id="5-1-实验设置"><a href="#5-1-实验设置" class="headerlink" title="5.1 实验设置"></a>5.1 实验设置</h3><ul>
+<li><p><strong>骨干模型</strong>：Llama-3.1-8B、Qwen-2.5-7B、Qwen-2.5-14B</p>
+</li>
+<li><p><strong>评测领域与数据集</strong>：通用知识理解（MMLU）、科学问答（ScienceQA）、数学推理（GSM8K）、代码生成（CodeAlpaca-20k 训练，HumanEval 评测）</p>
+</li>
+<li><p><strong>基线方法</strong>：基础 LoRA (r&#x3D;8&#x2F;r&#x3D;32)、Split-LoRA (4×8)、AdaLoRA、SoRA、HydraLoRA 等主流 PEFT 方法</p>
+</li>
+<li><p><strong>核心配置</strong>：FlyLoRA 总秩$r&#x3D;32$，激活秩$k&#x3D;8$，稀疏率$\rho&#x3D;8&#x2F;32$，仅矩阵$B$可训练</p>
+</li>
+</ul>
+<h3 id="5-2-单任务微调性能"><a href="#5-2-单任务微调性能" class="headerlink" title="5.2 单任务微调性能"></a>5.2 单任务微调性能</h3><p>FlyLoRA 在所有数据集上实现了<strong>性能与效率的双重超越</strong>：</p>
+<ol>
+<li><p>性能层面：FlyLoRA (k&#x3D;8) 全面超越同激活秩的 LoRA (r&#x3D;8)，同时显著优于同总秩的 LoRA (r&#x3D;32) 与 Split-LoRA (4×8)。例如在 Llama-3.1-8B 上，MMLU 准确率达 40.88%，HumanEval Pass@1 达 36.88%，较 LoRA (r&#x3D;32) 分别提升 1.95%、6.51%。</p>
+</li>
+<li><p>效率层面：FlyLoRA 的激活可训练参数量仅为 LoRA (r&#x3D;32) 的 1&#x2F;8 左右（Llama-3.1-8B 上仅 0.13%），训练显存占用与训练时长均低于所有基线，Llama-3.1-8B 上 MMLU 训练显存仅 10.6GB，较 LoRA (r&#x3D;8) 降低 15.2%。</p>
+</li>
+</ol>
+<h3 id="5-3-多任务模型合并性能"><a href="#5-3-多任务模型合并性能" class="headerlink" title="5.3 多任务模型合并性能"></a>5.3 多任务模型合并性能</h3><p>采用权重平均、TIES-MERGING、DARE 等主流无训练合并方法，FlyLoRA 均展现出极强的鲁棒性：</p>
+<ol>
+<li><p>性能衰减幅度远低于所有基线：Llama-3.1-8B 权重平均合并后，FlyLoRA 的 MMLU 准确率仅下降 2.02%，而 LoRA (r&#x3D;8) 下降 6.48%；ScienceQA 衰减幅度 43.05%，较基线降低近 20 个百分点。</p>
+</li>
+<li><p>部分场景下实现性能提升：Qwen-2.5-7B 合并后，FlyLoRA 的 MMLU 准确率甚至提升 6.55%，打破了多任务合并必然性能下降的固有认知。</p>
+</li>
+<li><p>与先进合并方法完全兼容：与 KnOTS、L-LoRA 等 SOTA 合并方法叠加使用后，可进一步提升合并性能，适配性极强。</p>
+</li>
+</ol>
+<h3 id="5-4-消融实验与超参数分析"><a href="#5-4-消融实验与超参数分析" class="headerlink" title="5.4 消融实验与超参数分析"></a>5.4 消融实验与超参数分析</h3><ol>
+<li><p>负载均衡：无负载均衡时，MMLU 准确率下降 3.32%，验证了负载均衡对 MoE 结构训练稳定性的关键作用。</p>
+</li>
+<li><p>矩阵 A 冻结策略：单任务场景下，冻结 A 与可训练 A 性能几乎无差异；但多任务合并时，可训练 A 会导致性能下降 4.43%，原因是训练破坏了随机矩阵的正交性。</p>
+</li>
+<li><p>激活策略：top-k 选择显著优于随机 k 选择和全激活，验证了生物启发的 “赢者通吃” 机制的有效性。</p>
+</li>
+<li><p>超参数敏感性：模型准确率随 A 的稀疏率提升而上升并饱和；固定总秩时，激活秩在中间值达到性能峰值；固定激活秩时，总秩越高性能越好。</p>
+</li>
+</ol>
+<h2 id="六、结论与未来工作"><a href="#六、结论与未来工作" class="headerlink" title="六、结论与未来工作"></a>六、结论与未来工作</h2><h3 id="6-1-核心结论"><a href="#6-1-核心结论" class="headerlink" title="6.1 核心结论"></a>6.1 核心结论</h3><p>本文重新审视了 MoE-based LoRA 架构的核心缺陷，受果蝇嗅觉神经回路启发，提出了 FlyLoRA 这一新型 LoRA 变体。通过秩级专家激活与固定稀疏随机投影的隐式路由设计，FlyLoRA 同时实现了任务内与任务间的参数解耦，彻底解决了传统 MoE-LoRA 的路由开销瓶颈。完备的理论分析与大量跨领域、跨模型的实验证明，FlyLoRA 在单任务微调中实现了性能与效率的同步提升，在无训练多任务模型合并中大幅缓解了性能衰减，为大模型参数高效微调提供了全新的范式。</p>
+<h3 id="6-2-未来工作"><a href="#6-2-未来工作" class="headerlink" title="6.2 未来工作"></a>6.2 未来工作</h3><ol>
+<li><p>探索矩阵 A 的自适应优化机制，结合神经科学最新发现，在保留正交性的前提下设计更具生物启发性的 A 更新策略，进一步提升任务解耦能力。</p>
+</li>
+<li><p>研究 FlyLoRA 与大模型强化学习（RL）微调的结合，解决 MoE 结构在 RL 训练中的稳定性问题，拓展方法的应用场景。</p>
+</li>
+<li><p>结合主动数据选择方法，进一步提升 FlyLoRA 的数据利用效率。</p>
+</li>
+<li><p>探索 FlyLoRA 在持续学习、多模态大模型微调等更多场景的落地应用。</p>
+</li>
+</ol>
+<h2 id="七、关键亮点与思考"><a href="#七、关键亮点与思考" class="headerlink" title="七、关键亮点与思考"></a>七、关键亮点与思考</h2><h3 id="7-1-核心亮点"><a href="#7-1-核心亮点" class="headerlink" title="7.1 核心亮点"></a>7.1 核心亮点</h3><ol>
+<li><p><strong>生物启发的极简创新，一举解决三大核心痛点</strong>：从果蝇嗅觉回路中获得核心灵感，用 “固定随机投影 + top-k 激活” 的极简设计，同时解决了 MoE-LoRA 的路由开销、任务内干扰、任务间干扰三大核心问题，实现了性能、效率、多任务兼容性的三重提升。</p>
+</li>
+<li><p><strong>理论与实验高度契合，结论扎实严谨</strong>：三大核心定理分别支撑了隐式路由、任务内解耦、任务间解耦的有效性，所有理论结论均有对应的实验验证，形成了完整的逻辑闭环。</p>
+</li>
+<li><p><strong>极致的工业落地价值</strong>：方法仅对 LoRA 的基础结构做了极简修改，无复杂额外模块，极易集成到现有的 PEFT 框架中；同时激活参数量更低、训练速度更快、显存占用更少，在消费级硬件上即可实现大模型高效微调，落地门槛极低。</p>
+</li>
+<li><p><strong>打破 LoRA 的固有设计认知</strong>：推翻了 “LoRA 的 A 矩阵必须可训练” 的固有思路，证明了冻结的随机投影 A 不仅不会损失性能，反而能通过正交性带来多任务合并的巨大收益，为后续 LoRA 变体设计提供了全新的方向。</p>
+</li>
+</ol>
+<h3 id="7-2-研究启发"><a href="#7-2-研究启发" class="headerlink" title="7.2 研究启发"></a>7.2 研究启发</h3><ol>
+<li><p>神经科学与 AI 的交叉创新仍有巨大潜力，生物大脑经过亿万年进化形成的极简、高效的信息处理机制，往往能为解决 AI 模型的核心瓶颈提供极具启发性的方案。</p>
+</li>
+<li><p>PEFT 方法的设计需要兼顾单任务性能与多任务兼容性，现有方法大多只关注单任务微调效果，而 FlyLoRA 通过统一的结构同时优化了两个维度，为 PEFT 研究提供了新的范式。</p>
+</li>
+<li><p>大模型落地的核心需求是 “高效、稳定、兼容”，极简的结构设计往往比复杂的模块堆叠更能满足工业场景的需求，在保证性能的同时降低落地与维护成本。</p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io">Fash0o0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://fash0o0.github.io/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/">https://fash0o0.github.io/2026/03/20/【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://fash0o0.github.io" target="_blank">Fash的回忆簿</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">论文笔记</a><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/PEFT/">PEFT</a><a class="post-meta__tags" href="/tags/LoRA/">LoRA</a><a class="post-meta__tags" href="/tags/MoE/">MoE</a></div><div class="post-share"><div class="social-share" data-image="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/03/20/%E3%80%90TMLR-2026-%E6%BE%B3%E9%97%A8%E5%A4%A7%E5%AD%A6%E3%80%91A%20Survey%20on%20Federated%20Fine-Tuning%20of%20Large%20Language%20Models/" title="【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：A Survey on Federated Fine-Tuning of Large Language Models 作者及单位：Yebo Wu, Chunlin Tian, Jingguang Li, He Sun, Kahou Tam, Zhanting Zhou, Haicheng Liao, Jing Xiong, Zhijiang Guo*, Li Li*, Chengzhong Xu（澳门大学物联网国家重点实验室、电子科技大学、香港大学、香港科技大学(广州)） 发表时间：2026年2月（Transactions on Machine Learning Research） 代码开源地址：GitHub repo持续追踪该领域进展（文中提及） 核心定位：针对大语言模型（LLMs）在隐私敏感场景下的微调需求，系统性地提出联邦微调（FedLLM）范式，通过参数高效微调（PEFT）技术解决通信开销、数据异构性、内存墙和计算开销四大核心挑战，实现隐私保护与模型性能的双重目标。   二、研究背景与核心问题2.1 背景演进大语言模型（LLMs）的崛起：GPT-4...</div></div></div></a><a class="pagination-related" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FedFMSL: Federated Learning of Foundation Models With Sparsely Activated LoRA  论文链接：https://ieeexplore.ieee.org/document/10648634/ (DOI: 10.1109&#x2F;TMC.2024.3454634)  作者及单位：  Panlong Wu, Kangshuo Li, Ting Wang：香港中文大学（深圳）理工学院、深圳智能未来网络研究院  Yanjie Dong, Victor C. M. Leung：深圳北理莫斯科大学人工智能研究院、粤港澳大湾区情感智能与普适计算联合实验室  Fangxin Wang（通讯作者）：香港中文大学（深圳）理工学院、深圳智能未来网络研究院、广东省智能未来网络重点实验室    发表时间：2024 年 9 月在线发表，2024 年 12 月正式刊出于《IEEE TRANSACTIONS ON MOBILE COMPUTING》（VOL. 23, NO. 12）  代码开源地址：暂未开源  核心定...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/01/19/%E3%80%90NeurIPS-2025-%E4%BD%9B%E7%BD%97%E9%87%8C%E8%BE%BE%E5%A4%A7%E5%AD%A6%E3%80%91Adaptive%20LoRA%20Experts%20Allocation%20and%20Selection%20for%20Federated%20Fine-Tuning/" title="【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-19</div><div class="info-item-2">【NeurIPS-2025-佛罗里达大学】Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息标题：Adaptive LoRA Experts Allocation and Selection for Federated Fine-Tuning（https://arxiv.org/abs/2509.15087v2） 作者及单位：Lei Wang (University of Florida), Jieming Bian (University of Florida), Letian Zhang (Middle Tennessee State University), Jie Xu (University of Florida) 发表时间：2025年（NeurIPS 2025） 代码开源地址：lei-wang-link&#x2F;FedLEASE 核心定位：针对联邦学习中语言模型微调的异构客户端问题，提出FedLEASE框架，通过自适应专家分配和选择机制，实现高效、隐私保护的联邦微调。 二、研究背景与核心问题大型语言模型(LLMs)在各种任务中表现出色，但针对特定领域应用的微调通常需要大量领域特定数据，这些数据可能分布在多个组织中。联邦学习(FL)提供了一种...</div></div></div></a><a class="pagination-related" href="/2026/01/27/%E3%80%90arXiv-2025-%E7%BE%8E%E5%9B%BD%E5%9C%A3%E6%AF%8D%E5%A4%A7%E5%AD%A6%E3%80%91FLAME%EF%BC%9ATowards%20Federated%20Fine%20-%20Tuning%20Large%20Language%20Models%20Through%20Adaptive%20SMoE/" title="【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-27</div><div class="info-item-2">【arXiv-2025-美国圣母大学】FLAME：Towards Federated Fine - Tuning Large Language Models Through Adaptive SMoE</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：FLAME: Towards Federated Fine-Tuning Large Language Models Through Adaptive SMoE 作者及单位：Khiem Le¹, Tuan Tran², Ting Hua¹, Nitesh V. Chawla¹；¹ 美国圣母大学，² 爱尔兰都柏林圣三一学院 发表时间：2025 年 07 月 14 日（arXiv 预印本）   代码开源地址：暂未开源 核心定位：针对资源自适应联邦微调中 LoRA 矩阵压缩导致的性能损失、无法真正适配客户端异构算力的核心痛点，提出基于自适应稀疏混合专家（SMoE）的 FLAME 联邦学习框架，在保留完整全局 LoRA 矩阵的前提下，通过调整客户端激活专家数量实现真实算力适配，同时解决输出量级不匹配和专家训练质量失衡问题，显著提升异构场景下联邦微调的性能与效率。  二、研究背景与核心问题研究背景【arXiv-2025-美国圣母大学】FLAME: Towards Federated Fine-Tuning Large Language Models Through ...</div></div></div></a><a class="pagination-related" href="/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/" title="【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-03</div><div class="info-item-2">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</div></div><div class="info-2"><div class="info-item-1">一、论文基本信息 标题：CoMoL: Efficient Mixture of LoRA Experts via Dynamic Core Space Merging  作者及单位：Jie Cao\、Zhenxuan Fan\、Zhuonan Wang、Tianwei Lin、Wenqiao Zhang†、Feifei Shao、Hongwei Wang、Jun Xiao、Siliang Tang（浙江大学）；Ziyuan Zhao、Rolan Yan（腾讯）（* 为共同一作，†为通讯作者）  发表时间：2026 年 2 月（arXiv 预印本，[cs.CL](cs.CL) 方向）  代码开源地址：暂未开源  核心定位：针对现有 MoE-LoRA 架构存在的参数效率受限、适配粒度粗糙的核心痛点，提出 CoMoL 新型 MoE-LoRA 框架，通过核心空间专家与核心空间路由两大核心组件，在与标准 LoRA 持平的参数与计算开销下，实现细粒度 token 级适配，在数学推理、代码生成等多任务上全面超越现有 SOTA 方法。   二、研究背景与核心问题研究背景大语言模型全量微调成本极高...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%BC%97%E6%B4%9B%E6%B4%9B.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Fash0o0</div><div class="author-info-description">在码头等火车</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Fash0o0"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">享受活着的每一天</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AE%BA%E6%96%87%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">一、论文基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF%E4%B8%8E%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">二、研究背景与核心问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A0%B8%E5%BF%83%E8%B4%A1%E7%8C%AE"><span class="toc-number">3.</span> <span class="toc-text">三、核心贡献</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">四、核心方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%9F%BA%E7%A1%80%E6%96%B9%E6%B3%95%E5%9B%9E%E9%A1%BE"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 基础方法回顾</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E6%96%B9%E6%B3%95%E7%81%B5%E6%84%9F%E6%9D%A5%E6%BA%90%EF%BC%9A%E6%9E%9C%E8%9D%87%E5%97%85%E8%A7%89%E5%9B%9E%E8%B7%AF"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 方法灵感来源：果蝇嗅觉回路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-FlyLoRA-%E7%9A%84%E5%BD%A2%E5%BC%8F%E5%8C%96%E5%AE%9A%E4%B9%89"><span class="toc-number">4.3.</span> <span class="toc-text">4.3 FlyLoRA 的形式化定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E4%B8%89%E5%A4%A7%E6%A0%B8%E5%BF%83%E7%90%86%E8%AE%BA%E6%94%AF%E6%92%91"><span class="toc-number">4.4.</span> <span class="toc-text">4.4 三大核心理论支撑</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%AE%9E%E9%AA%8C%E9%AA%8C%E8%AF%81"><span class="toc-number">5.</span> <span class="toc-text">五、实验验证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 实验设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E5%8D%95%E4%BB%BB%E5%8A%A1%E5%BE%AE%E8%B0%83%E6%80%A7%E8%83%BD"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 单任务微调性能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%A4%9A%E4%BB%BB%E5%8A%A1%E6%A8%A1%E5%9E%8B%E5%90%88%E5%B9%B6%E6%80%A7%E8%83%BD"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 多任务模型合并性能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C%E4%B8%8E%E8%B6%85%E5%8F%82%E6%95%B0%E5%88%86%E6%9E%90"><span class="toc-number">5.4.</span> <span class="toc-text">5.4 消融实验与超参数分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%BB%93%E8%AE%BA%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.</span> <span class="toc-text">六、结论与未来工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E6%A0%B8%E5%BF%83%E7%BB%93%E8%AE%BA"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 核心结论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 未来工作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%85%B3%E9%94%AE%E4%BA%AE%E7%82%B9%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">7.</span> <span class="toc-text">七、关键亮点与思考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E6%A0%B8%E5%BF%83%E4%BA%AE%E7%82%B9"><span class="toc-number">7.1.</span> <span class="toc-text">7.1 核心亮点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E7%A0%94%E7%A9%B6%E5%90%AF%E5%8F%91"><span class="toc-number">7.2.</span> <span class="toc-text">7.2 研究启发</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/10/%E3%80%90arXiv-2025-%E5%A4%A9%E6%B4%A5%E5%A4%A7%E5%AD%A6%E3%80%91ILoRA%EF%BC%9AFederated%20Learning%20with%20Low-Rank%20Adaptation%20for%20Heterogeneous%20Client%20Aggregation/" title="【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation">【arXiv-2025-天津大学】ILoRA：Federated Learning with Low-Rank Adaptation for Heterogeneous Client Aggregation</a><time datetime="2026-04-10T01:31:23.000Z" title="发表于 2026-04-10 09:31:23">2026-04-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/03/%E3%80%90arXiv-2026-%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E3%80%91CoMoL%EF%BC%9AEfficient%20Mixture%20of%20LoRA%20Experts%20via%20Dynamic%20Core%20Space%20Merging/" title="【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging">【arXiv-2026-浙江大学】CoMoL：Efficient Mixture of LoRA Experts via Dynamic Core Space Merging</a><time datetime="2026-04-03T01:31:23.000Z" title="发表于 2026-04-03 09:31:23">2026-04-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90TMLR-2026-%E6%BE%B3%E9%97%A8%E5%A4%A7%E5%AD%A6%E3%80%91A%20Survey%20on%20Federated%20Fine-Tuning%20of%20Large%20Language%20Models/" title="【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models">【TMLR-2026-澳门大学】A Survey on Federated Fine-Tuning of Large Language Models</a><time datetime="2026-03-20T15:45:34.000Z" title="发表于 2026-03-20 23:45:34">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/%E3%80%90NeurIPS-2025-%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E3%80%91FlyLoRA_%20Boosting%20Task%20Decoupling%20and%20Parameter%20Efficiency%20via%20Implicit%20Rank-Wise%20Mixture-of-Experts/" title="【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts">【NeurIPS-2025-清华大学】FlyLoRA_ Boosting Task Decoupling and Parameter Efficiency via Implicit Rank-Wise Mixture-of-Experts</a><time datetime="2026-03-20T03:31:23.000Z" title="发表于 2026-03-20 11:31:23">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/19/%E3%80%90IEEE%20Trans.%20Mob.%20Comput.-2024-%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%A6%E3%80%91FedFMSL%EF%BC%9AFederated%20Learning%20of%20Foundation%20Models%20With%20Sparsely%20Activated%20LoRA/" title="【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA">【IEEE Trans. Mob. Comput.-2024-香港中文大学】FedFMSL：Federated Learning of Foundation Models With Sparsely Activated LoRA</a><time datetime="2026-03-19T15:45:34.000Z" title="发表于 2026-03-19 23:45:34">2026-03-19</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2026 By Fash0o0</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="/"></script></div></body></html>
